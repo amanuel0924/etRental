@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser"
 
 import { notFound, gobalErrorHandler } from "./middleware/errorMiddleware.js"
 import userRouter from "./routes/userRoute.js"
+import houseRouter from "./routes/houseRoute.js"
 
 dotenv.config()
 DBconnection()
@@ -19,6 +20,7 @@ app.use(cookieParser())
 app.use(morgan("dev"))
 
 app.use("/api/users", userRouter)
+app.use("/api/house", houseRouter)
 
 app.all("*", notFound)
 app.use(gobalErrorHandler)

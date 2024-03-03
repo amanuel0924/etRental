@@ -8,6 +8,8 @@ import {
   deleteUser,
   login,
   logout,
+  forgotePassword,
+  reset,
 } from "../controller/userController.js"
 import { protect, admin } from "./../middleware/authMiddleware.js"
 import express from "express"
@@ -17,8 +19,11 @@ const router = express.Router()
 router.route("/register").post(register)
 router.route("/login").post(login)
 
+router.route("/forgotePassword").post(forgotePassword)
+router.route("/resetPassword/:token").put(reset)
+
 router.use(protect)
-router.route("logout").post(logout)
+router.route("/logout").post(logout)
 router.route("/profile").put(updateUserProfile).get(getUserProfile)
 
 router.use(admin)

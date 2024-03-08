@@ -1,4 +1,17 @@
 import express from "express"
+import {
+  request,
+  createFeedBack,
+  createHouse,
+  getAllHouse,
+  getAllfeedback,
+  getSingleFeedback,
+  getSingleHouse,
+  deleteFeedback,
+  deleteHouse,
+  updateFeedback,
+  updateHouse,
+} from "./../controller/houseController.js"
 
 const router = express.Router()
 

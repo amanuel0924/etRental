@@ -62,7 +62,11 @@ export const login = asyncHandler(async (req, res, next) => {
 })
 
 export const logout = asyncHandler(async (req, res, next) => {
-  res.cookie("jwt", "", {
+  res.cookie("accessToken", "", {
+    expires: new Date(Date.now() + 1 * 1000),
+    httpOnly: true,
+  })
+  res.cookie("refreshToken", "", {
     expires: new Date(Date.now() + 1 * 1000),
     httpOnly: true,
   })
@@ -76,7 +80,8 @@ export const getAlluser = asyncHandler(async (req, res, next) => {
 })
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id)
+  console.log(req.user)
+  const user = await User.findById(req.user.id)
   if (user) {
     res.status(200).json({
       _id: user._id,

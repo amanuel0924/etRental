@@ -1,13 +1,14 @@
 import jwt from "jsonwebtoken"
 import asyncHandler from "express-async-handler"
 import User from "./../model/userModel.js"
+import { renewToken } from "../utils/generateToken.js"
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token
-  token = req.cookies.jwt
-  if (token) {
+  let accessToken
+  accessToken = req.cookies.accessToken
+  if (accessToken) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET)
       req.user = await User.findById(decoded.id).select("-password")
       next()
     } catch (error) {
@@ -15,9 +16,15 @@ const protect = asyncHandler(async (req, res, next) => {
       throw new Error("Not authorized, token failed")
     }
   }
-  if (!token) {
-    res.status(401)
-    throw new Error("you are not logged in")
+  if (!accessToken) {
+    const { exist, id } = renewToken(req, res)
+    if (exist) {
+      req.user = await User.findById(id).select("-password")
+      next()
+    } else {
+      res.status(401)
+      throw new Error("you are not logged in")
+    }
   }
 })
 

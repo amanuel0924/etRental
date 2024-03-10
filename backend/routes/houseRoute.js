@@ -1,30 +1,19 @@
 import express from "express"
 import {
-  request,
-  createFeedBack,
+  requestToRent,
   createHouse,
   getAllHouse,
-  getAllfeedback,
-  getSingleFeedback,
   getSingleHouse,
-  deleteFeedback,
   deleteHouse,
-  updateFeedback,
   updateHouse,
 } from "./../controller/houseController.js"
+import { protect, admin } from "./../middleware/authMiddleware.js"
 
 const router = express.Router()
 
-router.route("/").get(getAllHouse).post(createHouse)
+router.route("/").get(getAllHouse).post(protect, createHouse)
 
 router.route("/:id").get(getSingleHouse).put(updateHouse).delete(deleteHouse)
-router.route("/:id/request").put(request)
-
-router
-  .route("/feedback/:id")
-  .delete(deleteFeedback)
-  .put(updateFeedback)
-  .get(getSingleFeedback)
-router.route("/feedback").get(getAllfeedback).post(createFeedBack)
+router.route("/:id/request").post(requestToRent)
 
 export default router

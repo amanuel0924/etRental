@@ -1,19 +1,5 @@
 import mongoose from "mongoose"
-
-const feedbackSchema = mongoose.Schema(
-  {
-    rating: { type: Number, required: true },
-    comment: { type: String, required: true },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-  },
-  {
-    timestamps: true,
-  }
-)
+import User from "./userModel.js"
 
 const houseSchema = mongoose.Schema({
   user: {
@@ -21,13 +7,13 @@ const houseSchema = mongoose.Schema({
     ref: User,
     required: true,
   },
-  site_location: {
+  siteLocation: {
     type: String,
     required: true,
   },
   category: {
     type: String,
-    enum: ["appatment", "villa", "studio"],
+    enum: ["apartment", "villa", "studio"],
   },
   type: {
     type: String,
@@ -41,23 +27,24 @@ const houseSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  photo_list: {
+  photoList: {
     type: String,
   },
+
   status: {
     type: String,
     enum: ["available", "pending", "rented"],
   },
-  view_count: {
+  viewCount: {
     type: Number,
   },
-  general_rating: {
+  generalRating: {
     type: Number,
   },
-  feedback: [feedbackSchema],
-  number_rente: {
+
+  numberRente: {
     type: Number,
-    required: true,
+    default: 0,
   },
 })
 

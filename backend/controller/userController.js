@@ -206,6 +206,7 @@ export const reset = asyncHandler(async (req, res, next) => {
     passwordResetToken: hashedToken,
     passwordResetExpiers: { $gt: Date.now() },
   })
+
   if (!user) {
     res.status(400)
     throw new Error("Token is invalid or has expired")

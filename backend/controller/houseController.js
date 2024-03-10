@@ -1,65 +1,83 @@
 import asyncHandler from "express-async-handler"
+import House from "./../model/houseModel.js"
 
 const getAllHouse = asyncHandler(async (req, res) => {
-  // Your logic to get all houses
-  res.send("getAllHouse")
+  console.log(req.query)
+  const houses = await House.find(req.query)
+  if (!houses) {
+    res.status(404)
+    throw new Error("No house found")
+  }
+  res.status(200).json(houses)
 })
 
 const createHouse = asyncHandler(async (req, res) => {
-  // Your logic to create a house
-  res.send("createHouse")
+  const {
+    siteLocation,
+    category,
+    type,
+    price,
+    description,
+    photoList,
+    status,
+    numberRente,
+  } = req.body
+
+  const house = await House.create({
+    user: req.user._id,
+    siteLocation,
+    category,
+    type,
+    price,
+    description,
+    photoList,
+    status,
+    numberRente,
+  })
+  if (house) {
+    res.status(201).json(house)
+  } else {
+    res.status(400)
+    throw new Error("Invalid house data")
+  }
 })
 
 const getSingleHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  // Your logic to get a single house by id
-  res.send("getSingleHouse")
+  const house = await House.findById(id)
+  if (!house) {
+    res.status(404)
+    throw new Error("No house found")
+  }
+  res.status(200).json(house)
 })
 
 const updateHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  // Your logic to update a house
-  res.send("updateHouse")
+  const house = await House.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+  if (!house) {
+    res.status(404)
+    throw new Error("No house found")
+  }
+  res.status(200).json(house)
 })
 
 const deleteHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  // Your logic to delete a house
-  res.send("deleteHouse")
+  const house = await House.findByIdAndDelete(id)
+  if (!house) {
+    res.status(404)
+    throw new Error("No house found")
+  }
+  res.status(200).json(house)
 })
 
-const request = asyncHandler(async (req, res) => {
+const requestToRent = asyncHandler(async (req, res) => {
   const { id } = req.params
-  // Your logic for the request route
   res.send("request")
-})
-
-const deleteFeedback = asyncHandler(async (req, res) => {
-  const { id } = req.params
-  // Your logic to delete feedback
-  res.send("deleteFeedback")
-})
-
-const updateFeedback = asyncHandler(async (req, res) => {
-  const { id } = req.params
-  // Your logic to update feedback
-  res.send("updateFeedback")
-})
-
-const getSingleFeedback = asyncHandler(async (req, res) => {
-  const { id } = req.params
-  // Your logic to get a single feedback
-  res.send("getSingleFeedback")
-})
-
-const getAllfeedback = asyncHandler(async (req, res) => {
-  // Your logic to get all feedback
-  res.send("getAllfeedback")
-})
-
-const createFeedBack = asyncHandler(async (req, res) => {
-  // Your logic to create feedback
-  res.send("createFeedBack")
 })
 
 export {
@@ -68,10 +86,5 @@ export {
   getSingleHouse,
   updateHouse,
   deleteHouse,
-  request,
-  deleteFeedback,
-  updateFeedback,
-  getSingleFeedback,
-  getAllfeedback,
-  createFeedBack,
+  requestToRent,
 }

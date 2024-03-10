@@ -5,7 +5,7 @@ const generateToken = (res, id) => {
     expiresIn: "2m",
   })
   const refreshToken = jwt.sign({ id }, process.env.REF_TOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "1d",
   })
   res.cookie("accessToken", accessToken, {
     maxAge: 60000,
@@ -14,7 +14,7 @@ const generateToken = (res, id) => {
     sameSite: "strict",
   })
   res.cookie("refreshToken", refreshToken, {
-    maxAge: 300000,
+    maxAge: 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: false,
     sameSite: "strict",
@@ -41,6 +41,7 @@ export const renewToken = (req, res) => {
         secure: false,
         sameSite: "strict",
       })
+      console.log("refresh token success")
       exist = true
     } catch (error) {
       res.status(401)

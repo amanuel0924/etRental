@@ -28,13 +28,15 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 })
 
-const admin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+const allowedTO = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      res.status(403)
+      throw new Error("You don't have permission to perform this action")
+    }
+
     next()
-  } else {
-    res.status(401)
-    throw new Error("Not authorized as an admin")
   }
 }
 
-export { protect, admin }
+export { protect, allowedTO }

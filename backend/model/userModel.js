@@ -10,6 +10,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
     password: {
       type: String,
@@ -17,8 +18,22 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "super", "broker"],
-      default: "user",
+      enum: ["renter", "landlord", "admin", "super", "broker"],
+      default: "renter",
+    },
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
+    block: {
+      type: Boolean,
+      default: false,
+      select: false,
+    },
+    blocker: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
     passwordResetToken: String,
     passwordResetExpiers: String,

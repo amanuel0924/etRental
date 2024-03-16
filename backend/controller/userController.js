@@ -5,8 +5,19 @@ import generateToken from "../utils/generateToken.js"
 import sendEmail from "../utils/email.js"
 import crypto from "crypto"
 
+const hashPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10)
+  return await bcrypt.hash(password, salt)
+}
+
 export const register = asyncHandler(async (req, res, next) => {
   const { name, email, role, password } = req.body
+
+  if (role === "super" || role === "admin") {
+    res.status(400)
+    throw new Error("you can't register as super or admin")
+  }
+
   if (!name || !email || !password) {
     res.status(400)
     throw new Error("Please add all fields")
@@ -18,8 +29,7 @@ export const register = asyncHandler(async (req, res, next) => {
     throw new Error("User already exists")
   }
 
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(password, salt)
+  const hashedPassword = await hashPassword(password)
   const user = await User.create({
     name,
     email,
@@ -29,6 +39,58 @@ export const register = asyncHandler(async (req, res, next) => {
   if (user) {
     generateToken(res, user._id)
 
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    })
+  } else {
+    res.status(400)
+    throw new Error("Invalid user data")
+  }
+})
+
+export const createAdmin = asyncHandler(async (req, res, next) => {
+  const { name, email, password, role } = req.body
+  if (!name || !email || !password) {
+    res.status(400)
+    throw new Error("Please add all fields")
+  }
+  const hashedPassword = await hashPassword(password)
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    role: role,
+  })
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    })
+  } else {
+    res.status(400)
+    throw new Error("Invalid user data")
+  }
+})
+
+export const createUser = asyncHandler(async (req, res, next) => {
+  const { name, email, role, password } = req.body
+  if (!name || !email || !password) {
+    res.status(400)
+    throw new Error("Please add all fields")
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role,
+  })
+  if (user) {
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -79,6 +141,16 @@ export const getAlluser = asyncHandler(async (req, res, next) => {
   res.status(200).json(users)
 })
 
+export const getUserById = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id).select("-password")
+  if (user) {
+    res.status(200).json(user)
+  } else {
+    res.status(404)
+    throw new Error("User not found")
+  }
+})
+
 export const getUserProfile = asyncHandler(async (req, res, next) => {
   console.log(req.user)
   const user = await User.findById(req.user.id)
@@ -97,7 +169,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 export const updateUserProfile = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body
 
-  const updatedFields = {}
+  let updatedFields = {}
   if (name) updatedFields.name = name
   if (email) updatedFields.email = email
   if (password) {
@@ -126,44 +198,111 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
     throw new Error("User not found")
   }
 })
+export const deleteMe = asyncHandler(async (req, res, next) => {
+  if (req.user.role === "super") {
+    res.status(404)
+    throw new Error("you can't delete super admin")
+  }
+  if (req.user.role === "admin") {
+    res.status(404)
+    throw new Error("you can't delete admin")
+  }
+  await User.findByIdAndUpdate(req.user._id, { active: false })
 
-export const getUserById = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id).select("-password")
-  if (user) {
-    res.status(200).json(user)
-  } else {
+  res.status(200).json({
+    message: "you are deleted successuly",
+  })
+})
+
+export const deactivateUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email })
+  if (!user) {
     res.status(404)
     throw new Error("User not found")
   }
+  await User.findByIdAndUpdate(user._id, { active: true })
+
+  res.status(200).json({
+    message: "user is deactivated successuly",
+  })
 })
+
 export const deleteUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id)
-  if (user) {
-    if (user.role === "admin") {
-      res.status(400)
-      throw new Error("You can't delete admin user")
-    }
-    await User.deleteOne({ _id: req.params.id })
-    res.status(200).json({ message: "User removed" })
-  } else {
+  if (!user) {
     res.status(404)
     throw new Error("User not found")
   }
+  if (user.role === "super") {
+    res.status(404)
+    throw new Error("you can't delete super admin")
+  }
+  if (user.role === "admin" && req.user.role !== "super") {
+    res.status(404)
+    throw new Error("you have not permisstion to delete  admin")
+  }
+
+  await User.deleteOne({ _id: req.params.id })
+  res.status(200).json({ message: "User removed" })
 })
+
 export const updateUser = asyncHandler(async (req, res, next) => {
   const { name, email, role } = req.body
   const user = await User.findById(req.params.id)
 
-  if (user) {
-    user.name = name || user.name
-    user.email = email || user.email
-    user.role = role || user.role
-    const updatedUser = await user.save()
-    res.status(200).json(updatedUser)
-  } else {
+  if (!user) {
     res.status(404)
     throw new Error("User not found")
   }
+  if (user.role === "super") {
+    res.status(404)
+    throw new Error("you can't update super admin")
+  }
+  if (user.role === "admin" && req.user.role !== "super") {
+    res.status(404)
+    throw new Error("you have not permisstion to update  admin")
+  }
+  user.name = name || user.name
+  user.email = email || user.email
+  user.role = role || user.role
+  const updatedUser = await user.save()
+  res.status(200).json(updatedUser)
+})
+export const blockUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id)
+  if (!user) {
+    res.status(404)
+    throw new Error("User not found")
+  }
+  if (user.role === "super") {
+    res.status(404)
+    throw new Error("you can't block super admin")
+  }
+  if (user.role === "admin" && req.user.role !== "super") {
+    res.status(404)
+    throw new Error("you have not permisstion to block  admin")
+  }
+  user.block = true
+  user.blocker = req.user._id
+  const updatedUser = await user.save()
+  res.status(200).json(updatedUser)
+})
+
+export const unBlockUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id)
+  if (!user) {
+    res.status(404)
+    throw new Error("User not found")
+  }
+
+  if (!user.role === "super" || req.user._id === user.blocker) {
+    res.status(404)
+    throw new Error("you have not permisstion to unblock  admin")
+  }
+  user.block = false
+  user.blocker = undefined
+  const updatedUser = await user.save()
+  res.status(200).json(updatedUser)
 })
 
 export const forgotePassword = asyncHandler(async (req, res, next) => {

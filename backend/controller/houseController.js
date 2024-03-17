@@ -51,7 +51,7 @@ const resize = asyncHandler(async (req, res, next) => {
       req.body.image.push(filename)
     })
   )
-  console.log(req.files)
+
   next()
 })
 
@@ -77,7 +77,6 @@ const getMyHouse = asyncHandler(async (req, res) => {
 })
 
 const createHouse = asyncHandler(async (req, res) => {
-  console.log(req.body)
   if (req.file) {
     const image = req.file.filename
     req.body.image = image
@@ -116,7 +115,7 @@ const createHouse = asyncHandler(async (req, res) => {
 
 const getSingleHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const house = await House.findById(id)
+  const house = await House.findById(id).populate("feedback")
   if (!house) {
     res.status(404)
     throw new Error("No house found")

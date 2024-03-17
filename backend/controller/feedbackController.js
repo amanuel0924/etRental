@@ -1,12 +1,15 @@
-import Feedback from "../model/feedbackModel"
+import Feedback from "./../model/feedbackModel.js"
 import asyncHandler from "express-async-handler"
+import House from "../model/houseModel.js"
+import User from "../model/userModel.js"
 
 const createFeedback = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body
+  const { rating, comment, house } = req.body
   const feedback = await Feedback.create({
     rating,
     comment,
-    user: req.user._id,
+    renter: req.user._id,
+    house,
   })
   if (feedback) {
     res.status(201).json(feedback)
@@ -17,7 +20,15 @@ const createFeedback = asyncHandler(async (req, res) => {
 })
 
 const getAllFeedback = asyncHandler(async (req, res) => {
-  const feedbacks = await Feedback.find({}).populate("user", "name")
+  const feedbacks = await Feedback.find({})
+    .populate({
+      path: "renter",
+      select: "name",
+    })
+    .populate({
+      path: "house",
+      select: "name",
+    })
   if (!feedbacks) {
     res.status(404)
     throw new Error("No feedback found")

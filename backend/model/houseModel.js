@@ -60,10 +60,14 @@ const houseSchema = mongoose.Schema(
       select: false,
     },
   },
-  {
-    timestamps: true,
-  }
+  { toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
 )
+
+houseSchema.virtual("feedback", {
+  ref: "Feedback",
+  foreignField: "house",
+  localField: "_id",
+})
 
 const House = mongoose.model("House", houseSchema)
 export default House

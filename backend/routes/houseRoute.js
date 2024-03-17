@@ -1,4 +1,4 @@
-import express from "express"
+import express from "express";
 import {
   createHouse,
   getAllHouse,
@@ -8,10 +8,10 @@ import {
   deleteMyHouse,
   uploadHousePhoto,
   resize,
-} from "./../controller/houseController.js"
-import { protect, allowedTO } from "./../middleware/authMiddleware.js"
+} from "./../controller/houseController.js";
+import { protect, allowedTO } from "./../middleware/authMiddleware.js";
 
-const router = express.Router()
+const router = express.Router();
 
 router
   .route("/")
@@ -22,13 +22,14 @@ router
     uploadHousePhoto,
     resize,
     createHouse
-  )
+  );
 
 router
   .route("/:id")
   .get(getSingleHouse)
   .put(updateHouse)
-  .delete(allowedTO("super", "admin"), deleteHouse)
-router.route("/deleteMyHouse").delete(deleteMyHouse)
+  .delete(allowedTO("super", "admin"), deleteHouse);
 
-export default router
+router.route("/deleteMyHouse/:id").delete(protect, deleteMyHouse);
+
+export default router;

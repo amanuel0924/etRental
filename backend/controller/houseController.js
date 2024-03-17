@@ -62,7 +62,7 @@ const getAllHouse = asyncHandler(async (req, res) => {
   const houses = await House.find(req.query)
   if (!houses) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
   res.status(200).json(houses)
 })
@@ -71,7 +71,7 @@ const getMyHouse = asyncHandler(async (req, res) => {
   const houses = await House.find({ user: req.user._id })
   if (!houses) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
   res.status(200).json(houses)
 })
@@ -119,7 +119,7 @@ const getSingleHouse = asyncHandler(async (req, res) => {
   const house = await House.findById(id)
   if (!house) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
   res.status(200).json(house)
 })
@@ -130,7 +130,7 @@ const updateHouse = asyncHandler(async (req, res) => {
 
   if (!house) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
 
   if (req.user._id !== house.user) {
@@ -152,7 +152,7 @@ const updateHouse = asyncHandler(async (req, res) => {
   })
   if (!updatedhouse) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
   res.status(200).json(updatedhouse)
 })
@@ -162,7 +162,7 @@ const deleteHouse = asyncHandler(async (req, res) => {
   const house = await House.findByIdAndDelete(id)
   if (!house) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
   res.status(200).json(house)
 })
@@ -184,7 +184,7 @@ const freezAndUnfreezHouse = asyncHandler(async (req, res, next) => {
   const house = await House.findById(id)
   if (!house) {
     res.status(404)
-    throw new Error("No house found")
+    throw new Error("House not found")
   }
 
   if (req.user._id !== house.user) {
@@ -193,19 +193,15 @@ const freezAndUnfreezHouse = asyncHandler(async (req, res, next) => {
   }
   if (house.houseStatus === "rented") {
     res.status(403)
-    throw new Error("you can't freez this house RENTED")
+    throw new Error("You can't freeze a rented house")
   }
 
-  await House.findByIdAndUpdate(req.params._id, {
-    houseStatus: `${
-      house.houseStatus === "available" ? "unavailable" : "available"
-    }`,
-  })
+  await House.findByIdAndUpdate(id, {
+    houseStatus: house.houseStatus === "available" ? "unavailable" : "available",
+  });
 
-  res.status(200).json({
-    message: "house deleted successuly",
-  })
-})
+  res.status(200).json({ message: "House status updated successfully" });
+});
 
 export {
   getAllHouse,

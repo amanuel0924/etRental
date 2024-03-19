@@ -1,6 +1,21 @@
 import mongoose from "mongoose"
 import User from "./userModel.js"
 
+const feedbackSchema = mongoose.Schema(
+  {
+    rating: { type: Number, required: true },
+    comment: { type: String, required: true },
+    renter: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+  },
+  {
+    timestamps: true,
+  }
+)
+
 const houseSchema = mongoose.Schema(
   {
     user: {
@@ -18,12 +33,20 @@ const houseSchema = mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["apartment", "villa"],
-      default: "apartment",
+      enum: ["apartment", "villa", "condominium", "service"],
+      default: "service",
     },
     type: {
       type: String,
-      enum: ["single", "double", "three-bed"],
+      enum: [
+        "one-bedroom",
+        "two-bedroom",
+        "three-bedroom",
+        "studio",
+        "single",
+        "G+1",
+        "G+2",
+      ],
       default: "single",
     },
     price: {
@@ -47,9 +70,9 @@ const houseSchema = mongoose.Schema(
     },
     generalRating: {
       type: Number,
-      default: 4,
+      default: 0,
     },
-
+    feedbacks: [feedbackSchema],
     numberRente: {
       type: Number,
       default: 0,
@@ -59,15 +82,13 @@ const houseSchema = mongoose.Schema(
       default: true,
       select: false,
     },
+    viewCount: {
+      type: Number,
+      default: 0,
+    },
   },
-  { toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true }
+  { timestamps: true }
 )
-
-houseSchema.virtual("feedback", {
-  ref: "Feedback",
-  foreignField: "house",
-  localField: "_id",
-})
 
 const House = mongoose.model("House", houseSchema)
 export default House

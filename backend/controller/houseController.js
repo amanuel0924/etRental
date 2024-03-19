@@ -4,17 +4,6 @@ import multer from "multer"
 import path from "path"
 import sharp from "sharp"
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/")
-//   },
-//   filename(req, file, cb) {
-//     cb(
-//       null,
-//       `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-//     )
-//   },
-// })
 const storage = multer.memoryStorage()
 
 const multerFilter = (req, file, cb) => {
@@ -120,6 +109,10 @@ const getSingleHouse = asyncHandler(async (req, res) => {
     res.status(404)
     throw new Error("House not found")
   }
+  if (req.user.role === "renter") {
+    house.viewCount = house.viewCount + 1
+    await house.save()
+  }
   res.status(200).json(house)
 })
 
@@ -196,11 +189,51 @@ const freezAndUnfreezHouse = asyncHandler(async (req, res, next) => {
   }
 
   await House.findByIdAndUpdate(id, {
-    houseStatus: house.houseStatus === "available" ? "unavailable" : "available",
-  });
+    houseStatus:
+      house.houseStatus === "available" ? "unavailable" : "available",
+  })
 
-  res.status(200).json({ message: "House status updated successfully" });
-});
+  res.status(200).json({ message: "House status updated successfully" })
+})
+const createFeedback = asyncHandler(async (req, res, next) => {
+  const { rating, comment } = req.body
+
+  const house = await House.findById(req.params.id)
+
+  if (house) {
+    const feedbackIsExist = house.feedbacks.find(
+      (feedback) => feedback.renter.toString() === req.user._id.toString()
+    )
+    if (feedbackIsExist) {
+      res.status(400)
+      throw new Error("house already reviewd")
+    }
+    if (req.user.role !== "renter") {
+      res.status(400)
+      throw new Error(" only renter can give feedback for house")
+    }
+    const feedback = {
+      renter: req.user._id,
+      rating: Number(rating),
+      comment,
+    }
+
+    house.feedbacks.push(feedback)
+
+    house.numFeedbacks = house.feedbacks.length
+    house.generalRating =
+      house.feedbacks.reduce((acc, item) => item.rating + acc, 0) /
+      house.feedbacks.length
+    await house.save()
+    res.status(201).json({
+      status: "success",
+      message: "feedback added",
+    })
+  } else {
+    res.status(404)
+    throw new Error("resource not found")
+  }
+})
 
 export {
   getAllHouse,
@@ -213,4 +246,5 @@ export {
   freezAndUnfreezHouse,
   uploadHousePhoto,
   resize,
+  createFeedback,
 }

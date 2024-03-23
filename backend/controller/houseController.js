@@ -1,51 +1,7 @@
 import asyncHandler from "express-async-handler"
 import House from "./../model/houseModel.js"
-import multer from "multer"
-import path from "path"
-import sharp from "sharp"
-
-const storage = multer.memoryStorage()
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true)
-  } else {
-    cb(new Error("Please upload only images."), false)
-  }
-}
-
-const upload = multer({
-  storage: storage,
-  fileFilter: multerFilter,
-})
-
-const resize = asyncHandler(async (req, res, next) => {
-  if (!req.files) {
-    return next()
-  }
-  req.body.image = []
-  await Promise.all(
-    req.files.map(async (file, i) => {
-      const filename = `image-${Date.now()}-${i + 1}.jpeg`
-      // req.file.path = `uploads/${req.file.filename}`
-      await sharp(file.buffer)
-        .resize({
-          width: 500,
-          height: 500,
-          fit: "cover",
-        })
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(path.resolve("uploads/", filename))
-      req.body.image.push(filename)
-    })
-  )
-
-  next()
-})
-
-const uploadHousePhoto = upload.array("image", 3)
-
+import PendingOrder from "../model/pendingOrderModel.js"
+import { uploadHousePhoto, resize } from "./uploadController.js"
 const getAllHouse = asyncHandler(async (req, res) => {
   console.log(req.query)
   const houses = await House.find(req.query)
@@ -57,7 +13,20 @@ const getAllHouse = asyncHandler(async (req, res) => {
 })
 
 const getMyHouse = asyncHandler(async (req, res) => {
-  const houses = await House.find({ user: req.user._id })
+  const queryObj =
+    req.user.role === "landlord"
+      ? {
+          hasBroker: false,
+          user: req.user._id,
+          active: true,
+        }
+      : {
+          active: true,
+          hasBroker: true,
+          brokers: { $elemMatch: { broker: req.user._id } },
+        }
+
+  const houses = await House.find(queryObj)
   if (!houses) {
     res.status(404)
     throw new Error("House not found")
@@ -66,10 +35,6 @@ const getMyHouse = asyncHandler(async (req, res) => {
 })
 
 const createHouse = asyncHandler(async (req, res) => {
-  if (req.file) {
-    const image = req.file.filename
-    req.body.image = image
-  }
   const {
     siteLocation,
     category,
@@ -104,7 +69,7 @@ const createHouse = asyncHandler(async (req, res) => {
 
 const getSingleHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const house = await House.findById(id).populate("feedback")
+  const house = await House.findById(id)
   if (!house) {
     res.status(404)
     throw new Error("House not found")
@@ -125,12 +90,12 @@ const updateHouse = asyncHandler(async (req, res) => {
     throw new Error("House not found")
   }
 
-  if (req.user._id !== house.user) {
+  if (req.user._id.toString() !== house.user.toString()) {
     res.status(403)
     throw new Error("you can't edit other's house")
   }
 
-  const allowedUpdates = ["name", "description", "price", "photoList"]
+  const allowedUpdates = ["name", "description", "price", "image"]
   const updates = Object.keys(req.body).reduce((acc, key) => {
     if (allowedUpdates.includes(key)) {
       acc[key] = req.body[key]
@@ -156,22 +121,29 @@ const deleteHouse = asyncHandler(async (req, res) => {
     res.status(404)
     throw new Error("House not found")
   }
-  res.status(200).json(house)
+  res.status(200).json({ message: "House deleted successfully" })
 })
+
 const deleteMyHouse = asyncHandler(async (req, res, next) => {
-  if (req.user.role !== "landlord" || req.user.role !== "broker") {
+  const id = req.params.id
+  const house = await House.findById(id)
+  if (!house) {
     res.status(404)
-    throw new Error("you don't have permition to do perform this action")
+    throw new Error("House not found")
+  }
+  if (req.user._id.toString() !== house.user.toString()) {
+    res.status(403)
+    throw new Error("you can't delete other's house")
   }
 
-  await House.findByIdAndUpdate(req.params._id, { active: false })
+  await House.findByIdAndUpdate(req.params.id, { active: false })
 
   res.status(200).json({
     message: "house deleted successuly",
   })
 })
 
-const freezAndUnfreezHouse = asyncHandler(async (req, res, next) => {
+const lockAndUnlockHouse = asyncHandler(async (req, res, next) => {
   const { id } = req.params
   const house = await House.findById(id)
   if (!house) {
@@ -179,7 +151,7 @@ const freezAndUnfreezHouse = asyncHandler(async (req, res, next) => {
     throw new Error("House not found")
   }
 
-  if (req.user._id !== house.user) {
+  if (req.user._id.toString() !== house.user.toString()) {
     res.status(403)
     throw new Error("you can't edit other's house")
   }
@@ -201,6 +173,15 @@ const createFeedback = asyncHandler(async (req, res, next) => {
   const house = await House.findById(req.params.id)
 
   if (house) {
+    //check if renter is renter of this house in rentehistory array
+    const renterIsExist = house.renterHistory.find(
+      (renter) => renter.toString() === req.user._id.toString()
+    )
+    if (!renterIsExist) {
+      res.status(400)
+      throw new Error("you can't give feedback for this house")
+    }
+
     const feedbackIsExist = house.feedbacks.find(
       (feedback) => feedback.renter.toString() === req.user._id.toString()
     )
@@ -208,13 +189,14 @@ const createFeedback = asyncHandler(async (req, res, next) => {
       res.status(400)
       throw new Error("house already reviewd")
     }
+    console.log(req.user)
     if (req.user.role !== "renter") {
       res.status(400)
       throw new Error(" only renter can give feedback for house")
     }
     const feedback = {
       renter: req.user._id,
-      rating: Number(rating),
+      rating,
       comment,
     }
 
@@ -234,6 +216,119 @@ const createFeedback = asyncHandler(async (req, res, next) => {
     throw new Error("resource not found")
   }
 })
+const createBrokersRequest = asyncHandler(async (req, res) => {
+  const { id: houseId } = req.params
+  const house = await House.findById(houseId)
+  if (!house) {
+    res.status(404)
+    throw new Error("house not found")
+  }
+
+  if (house.user.toString() === req.user._id.toString()) {
+    res.status(400)
+    throw new Error("you can't request your own house")
+  }
+  const isExist = house.brokers.find(
+    (broker) => broker.broker.toString() === req.user._id.toString()
+  )
+  if (isExist) {
+    res.status(400)
+    throw new Error("you already requested this house")
+  }
+  const brokerRequest = {
+    broker: req.user._id,
+    house: houseId,
+    status: "pending",
+    commition: req.body.commition,
+  }
+  house.brokers.push(brokerRequest)
+  await house.save()
+  res.status(201).json({
+    status: "success",
+    message: "request sent",
+  })
+})
+const acceptBrokerRequest = asyncHandler(async (req, res) => {
+  const { houseId, brokerId } = req.body
+  const house = await House.findById(houseId)
+  if (!house) {
+    res.status(404)
+    throw new Error("house not found")
+  }
+  const brokerRequest = house.brokers.find(
+    (broker) => broker.broker.toString() === brokerId
+  )
+  if (!brokerRequest) {
+    res.status(404)
+    throw new Error("request not found")
+  }
+  if (brokerRequest.status !== "pending") {
+    res.status(400)
+    throw new Error("request already accepted or rejected")
+  }
+  brokerRequest.status = "accepted"
+  house.hasBroker = true
+  //reject other brokers
+  house.brokers.forEach((broker) => {
+    if (broker.broker.toString() !== brokerId) {
+      broker.status = "rejected"
+    }
+  })
+  await house.save()
+  res.status(200).json({
+    status: "success",
+    message: "request accepted",
+  })
+})
+const rejectBrokerRequest = asyncHandler(async (req, res) => {
+  const { houseId, brokerId } = req.body
+  const house = await House.findById(houseId)
+  if (!house) {
+    res.status(404)
+    throw new Error("house not found")
+  }
+  const brokerRequest = house.brokers.find(
+    (broker) => broker.broker.toString() === brokerId
+  )
+  if (!brokerRequest) {
+    res.status(404)
+    throw new Error("request not found")
+  }
+  if (brokerRequest.status !== "pending") {
+    res.status(400)
+    throw new Error("request already accepted or rejected")
+  }
+  brokerRequest.status = "rejected"
+  await house.save()
+  res.status(200).json({
+    status: "success",
+    message: "request rejected",
+  })
+})
+
+//make available house for rent
+const makeHouseAvailable = asyncHandler(async (req, res) => {
+  const { id } = req.params
+  const house = await House.findById(id)
+  if (!house) {
+    res.status(404)
+    throw new Error("House not found")
+  }
+  if (req.user._id.toString() !== house.user.toString()) {
+    res.status(403)
+    throw new Error("you can't edit other's house")
+  }
+
+  house.houseStatus = "available"
+  house.hasBroker = false
+  house.brokers = []
+  //remove all pending orders for this house
+  await PendingOrder.deleteMany({ houseEntityId: id })
+
+  await house.save()
+
+  res.status(200).json({ message: "House status updated successfully" })
+})
 
 export {
   getAllHouse,
@@ -243,8 +338,12 @@ export {
   deleteHouse,
   deleteMyHouse,
   getMyHouse,
-  freezAndUnfreezHouse,
+  lockAndUnlockHouse,
   uploadHousePhoto,
   resize,
   createFeedback,
+  createBrokersRequest,
+  acceptBrokerRequest,
+  rejectBrokerRequest,
+  makeHouseAvailable,
 }

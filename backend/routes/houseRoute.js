@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"
 import {
   createHouse,
   getAllHouse,
@@ -6,12 +6,18 @@ import {
   deleteHouse,
   updateHouse,
   deleteMyHouse,
-  uploadHousePhoto,
-  resize,
-} from "./../controller/houseController.js";
-import { protect, allowedTO } from "./../middleware/authMiddleware.js";
+  createBrokersRequest,
+  acceptBrokerRequest,
+  rejectBrokerRequest,
+  getMyHouse,
+  lockAndUnlockHouse,
+  createFeedback,
+  makeHouseAvailable,
+} from "./../controller/houseController.js"
+import { protect, allowedTO } from "./../middleware/authMiddleware.js"
+import { uploadHousePhoto, resize } from "./../controller/uploadController.js"
 
-const router = express.Router();
+const router = express.Router()
 
 router
   .route("/")
@@ -22,14 +28,36 @@ router
     uploadHousePhoto,
     resize,
     createHouse
-  );
+  )
+router
+  .route("/myHouse")
+  .get(protect, allowedTO("broker", "landlord"), getMyHouse)
+router
+  .route("/sendBrokersRequest/:id")
+  .post(protect, allowedTO("broker"), createBrokersRequest)
+router
+  .route("/acceptBrokerRequest")
+  .post(protect, allowedTO("landlord"), acceptBrokerRequest)
+router
+  .route("/rejectBrokerRequest")
+  .post(protect, allowedTO("landlord"), rejectBrokerRequest)
 
 router
+  .route("/lockAndUnlockHouse/:id")
+  .put(protect, allowedTO("broker", "landlord"), lockAndUnlockHouse)
+
+router.route("/makeHouseAvailable/:id").put(protect, makeHouseAvailable)
+router
   .route("/:id")
-  .get(getSingleHouse)
-  .put(updateHouse)
-  .delete(allowedTO("super", "admin"), deleteHouse);
+  .get(protect, getSingleHouse)
+  .put(protect, uploadHousePhoto, resize, updateHouse)
+  .delete(protect, allowedTO("super", "admin"), deleteHouse)
+router
+  .route("/createFeedback/:id")
+  .post(protect, allowedTO("renter"), createFeedback)
 
-router.route("/deleteMyHouse/:id").delete(protect, deleteMyHouse);
+router
+  .route("/deleteMyHouse/:id")
+  .delete(protect, allowedTO("landlord", "broker"), deleteMyHouse)
 
-export default router;
+export default router

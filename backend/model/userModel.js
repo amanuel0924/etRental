@@ -35,6 +35,15 @@ const userSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    image: {
+      type: String,
+      default: "default.jpg",
+    },
+    Verified: {
+      type: Boolean,
+      default: false,
+    },
+
     passwordResetToken: String,
     passwordResetExpiers: String,
   },

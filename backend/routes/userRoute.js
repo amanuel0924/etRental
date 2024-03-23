@@ -13,15 +13,18 @@ import {
   deleteMe,
   blockUser,
   unBlockUser,
-  createAdmin,
   createUser,
 } from "../controller/userController.js"
 import { protect, allowedTO } from "../middleware/authMiddleware.js"
+import {
+  resizeUser,
+  uploadUserPhoto,
+} from "./../controller/uploadController.js"
 import express from "express"
 
 const router = express.Router()
 
-router.route("/register").post(register)
+router.route("/register").post(uploadUserPhoto, resizeUser, register)
 router.route("/login").post(login)
 
 router.route("/forgotePassword").post(forgotePassword)
@@ -42,6 +45,4 @@ router.route("/block/:id").put(blockUser)
 router.route("/unblock/:id").put(unBlockUser)
 router.route("/createUser").post(createUser)
 
-router.use(allowedTO("super"))
-router.route("/createAdmin").post(createAdmin)
 export default router

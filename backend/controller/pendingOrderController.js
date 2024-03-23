@@ -14,8 +14,19 @@ const createPending = asyncHandler(async (req, res, next) => {
     throw new Error("House is not available")
   }
 
+  //check if renter has  pendingorder for this house
+
+  const pendingOrder = await PendingOrder.find({
+    houseEntityId,
+    tenetId: req.user._id,
+  })
+  if (pendingOrder.length > 0) {
+    res.status(403)
+    throw new Error("You already have pending order for this house")
+  }
+
   const pending = await PendingOrder.create({
-    tendetId: req.user._id,
+    tenetId: req.user._id,
     bidPrice,
     houseEntityId,
     startDate,
@@ -25,7 +36,7 @@ const createPending = asyncHandler(async (req, res, next) => {
 })
 
 const getMyPending = asyncHandler(async (req, res) => {
-  const pending = await PendingOrder.find({ tendetId: req.user._id }).populate(
+  const pending = await PendingOrder.find({ tenetId: req.user._id }).populate(
     "houseEntityId"
   )
   if (!pending) {
@@ -43,10 +54,11 @@ const getAllPending = asyncHandler(async (req, res) => {
   }
   res.status(200).json(pending)
 })
+
 const getPendingOrdersForHouse = asyncHandler(async (req, res) => {
   const { id: houseId } = req.params
   const pending = await PendingOrder.find({ houseEntityId: houseId }).populate(
-    "tendetId"
+    "tenetId"
   )
   if (!pending) {
     res.status(404)
@@ -57,7 +69,9 @@ const getPendingOrdersForHouse = asyncHandler(async (req, res) => {
 
 const getSinglePending = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const pending = await PendingOrder.findById(id).populate("houseEntityId")
+  const pending = await PendingOrder.findById(id)
+    .populate("houseEntityId")
+    .populate("tenetId")
   if (!pending) {
     res.status(404)
     throw new Error("Pending not found")
@@ -81,12 +95,21 @@ const acceptPending = asyncHandler(async (req, res) => {
     res.status(403)
     throw new Error("House is not available")
   }
+  let broker
+  if (house.hasBroker) {
+    broker = house.brokers.find((broker) => broker.status === "accepted")
+  }
+  if (req.user._id.toString() !== broker._id.toString()) {
+    res.status(403)
+    throw new Error("House has broker")
+  }
   house.houseStatus = "rented"
+  house.rentershistory.push(pending.tenetId)
+  house.numberRente = house.numberRente + 1
   await house.save()
   pending.status = "accepted"
   await pending.save()
 
-  //reject all  pendings
   const pendings = await PendingOrder.find({ houseEntityId: house._id })
   pendings.forEach(async (pending) => {
     if (pending._id != id) {
@@ -109,6 +132,7 @@ const rejectPending = asyncHandler(async (req, res) => {
   await pending.save()
   res.status(200).json(pending)
 })
+
 const proposeCounterOffer = asyncHandler(async (req, res) => {
   const { id } = req.params
   const { counterOfferPrice } = req.body
@@ -140,6 +164,8 @@ const acceptCounterOffer = asyncHandler(async (req, res) => {
     throw new Error("House is not available")
   }
   house.houseStatus = "rented"
+  house.rentershistory.push(pending.tenetId)
+  house.numberRente = house.numberRente + 1
   await house.save()
   pending.status = "accepted"
   pending.hasCouterOffer = false
@@ -169,3 +195,16 @@ const rejectCounterOffer = asyncHandler(async (req, res) => {
   await pending.save()
   res.status(200).json(pending)
 })
+
+export {
+  createPending,
+  getMyPending,
+  getAllPending,
+  getSinglePending,
+  acceptPending,
+  rejectPending,
+  proposeCounterOffer,
+  acceptCounterOffer,
+  rejectCounterOffer,
+  getPendingOrdersForHouse,
+}

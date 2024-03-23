@@ -1,14 +1,16 @@
 import mongoose from "mongoose"
+import User from "./userModel.js"
+import House from "./houseModel.js"
 
 const pendingOrderSchema = mongoose.Schema(
   {
-    tendetId: {
+    tenetId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: User,
       required: true,
     },
     bidPrice: {
-      type: number,
+      type: Number,
       required: true,
     },
     houseEntityId: {
@@ -16,9 +18,8 @@ const pendingOrderSchema = mongoose.Schema(
       ref: House,
       required: true,
     },
-
     status: {
-      type: string,
+      type: String,
       enum: ["accepted", "pending", "rejected", "couterOffer"],
       default: "pending",
     },

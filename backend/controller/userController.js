@@ -11,14 +11,14 @@ const hashPassword = async (password) => {
 }
 
 export const register = asyncHandler(async (req, res, next) => {
-  const { name, email, role, password } = req.body
+  const { name, email, role, password, image } = req.body
 
   if (role === "super" || role === "admin") {
     res.status(400)
     throw new Error("you can't register as super or admin")
   }
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !image) {
     res.status(400)
     throw new Error("Please add all fields")
   }
@@ -35,6 +35,8 @@ export const register = asyncHandler(async (req, res, next) => {
     email,
     password: hashedPassword,
     role,
+    image,
+    verified: role === "super" || role === "admin" ? true : false,
   })
   if (user) {
     generateToken(res, user._id)
@@ -44,32 +46,7 @@ export const register = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       role: user.role,
-    })
-  } else {
-    res.status(400)
-    throw new Error("Invalid user data")
-  }
-})
-
-export const createAdmin = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role } = req.body
-  if (!name || !email || !password) {
-    res.status(400)
-    throw new Error("Please add all fields")
-  }
-  const hashedPassword = await hashPassword(password)
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    role: role,
-  })
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
+      image: user.image,
     })
   } else {
     res.status(400)
@@ -78,17 +55,26 @@ export const createAdmin = asyncHandler(async (req, res, next) => {
 })
 
 export const createUser = asyncHandler(async (req, res, next) => {
-  const { name, email, role, password } = req.body
+  const { name, email, password, role } = req.body
   if (!name || !email || !password) {
     res.status(400)
     throw new Error("Please add all fields")
   }
-
+  if (req.user.role === "super" && role === "super") {
+    res.status(400)
+    throw new Error("you can't register as super ")
+  }
+  if (req.user.role === "admin" && (role === "super" || role === "admin")) {
+    res.status(400)
+    throw new Error("admin can't register an admin or super admin")
+  }
+  const hashedPassword = await hashPassword(password)
   const user = await User.create({
     name,
     email,
-    password,
-    role,
+    password: hashedPassword,
+    role: role,
+    verified: true,
   })
   if (user) {
     res.status(201).json({
@@ -152,7 +138,6 @@ export const getUserById = asyncHandler(async (req, res, next) => {
 })
 
 export const getUserProfile = asyncHandler(async (req, res, next) => {
-  console.log(req.user)
   const user = await User.findById(req.user.id)
   if (user) {
     res.status(200).json({
@@ -160,6 +145,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
     })
   } else {
     res.status(404)
@@ -167,11 +153,12 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
   }
 })
 export const updateUserProfile = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body
+  const { name, email, password, image } = req.body
 
   let updatedFields = {}
   if (name) updatedFields.name = name
   if (email) updatedFields.email = email
+  if (image) updatedFields.image = image
   if (password) {
     const salt = await bcrypt.genSalt(10)
     updatedFields.password = await bcrypt.hash(password, salt)
@@ -192,6 +179,7 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      image: updatedUser.image,
     })
   } else {
     res.status(404)
@@ -247,24 +235,21 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 })
 
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const { name, email, role } = req.body
+  const { name, email, image } = req.body
   const user = await User.findById(req.params.id)
 
   if (!user) {
     res.status(404)
     throw new Error("User not found")
   }
-  if (user.role === "super") {
-    res.status(404)
-    throw new Error("you can't update super admin")
-  }
+
   if (user.role === "admin" && req.user.role !== "super") {
     res.status(404)
     throw new Error("you have not permisstion to update  admin")
   }
   user.name = name || user.name
   user.email = email || user.email
-  user.role = role || user.role
+  user.image = image || user.image
   const updatedUser = await user.save()
   res.status(200).json(updatedUser)
 })

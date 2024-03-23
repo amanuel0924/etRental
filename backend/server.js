@@ -7,8 +7,8 @@ import cookieParser from "cookie-parser"
 import { notFound, gobalErrorHandler } from "./middleware/errorMiddleware.js"
 import userRouter from "./routes/userRoute.js"
 import houseRouter from "./routes/houseRoute.js"
-//import feedbackRouter from "./routes/feedbackRoute.js"
-
+import pendingOrderRouter from "./routes/pendingOrderRoute.js"
+import reportRouter from "./routes/reportRoute.js"
 dotenv.config()
 DBconnection()
 
@@ -22,7 +22,8 @@ app.use(morgan("dev"))
 
 app.use("/api/users", userRouter)
 app.use("/api/house", houseRouter)
-//app.use("/api/feedback", feedbackRouter)
+app.use("/api/pendingOrder", pendingOrderRouter)
+app.use("/api/report", reportRouter)
 
 app.all("*", notFound)
 app.use(gobalErrorHandler)

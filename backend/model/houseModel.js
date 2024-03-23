@@ -16,6 +16,31 @@ const feedbackSchema = mongoose.Schema(
   }
 )
 
+const brokerRequestSchema = mongoose.Schema(
+  {
+    broker: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
+      required: true,
+    },
+    house: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "House",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+    commition: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true }
+)
+
 const houseSchema = mongoose.Schema(
   {
     user: {
@@ -23,6 +48,11 @@ const houseSchema = mongoose.Schema(
       ref: User,
       required: true,
     },
+    hasBroker: {
+      type: Boolean,
+      default: false,
+    },
+    brokers: [brokerRequestSchema],
     name: {
       type: String,
       required: true,
@@ -80,12 +110,12 @@ const houseSchema = mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
-      select: false,
     },
     viewCount: {
       type: Number,
       default: 0,
     },
+    rentershistory: [],
   },
   { timestamps: true }
 )

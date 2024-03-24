@@ -142,7 +142,12 @@ export const getAlluser = asyncHandler(async (req, res, next) => {
     throw new Error("No user found")
   }
 
-  res.status(200).json(users)
+  res.status(200).json({
+    results: users.length,
+    page,
+    pages: Math.ceil(count / pageSize),
+    users,
+  })
 })
 
 export const getUserById = asyncHandler(async (req, res, next) => {

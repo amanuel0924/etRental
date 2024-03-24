@@ -3,16 +3,36 @@ import House from "./../model/houseModel.js"
 import PendingOrder from "../model/pendingOrderModel.js"
 import { uploadHousePhoto, resize } from "./uploadController.js"
 const getAllHouse = asyncHandler(async (req, res) => {
-  console.log(req.query)
-  const houses = await House.find(req.query)
+  const pageSize = 2
+  const page = Number(req.query.pageNumber) || 1
+  const queryObj = req.query.keyword
+    ? {
+        active: true,
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : { active: true }
+  const count = await House.countDocuments(queryObj)
+  const houses = await House.find(queryObj)
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
   if (!houses) {
     res.status(404)
     throw new Error("House not found")
   }
-  res.status(200).json(houses)
+  res.status(200).json({
+    result: houses.length,
+    page,
+    pages: Math.ceil(count / pageSize),
+    houses,
+  })
 })
 
 const getMyHouse = asyncHandler(async (req, res) => {
+  const pageSize = 8
+  const page = Number(req.query.pageNumber) || 1
   const queryObj =
     req.user.role === "landlord"
       ? {
@@ -25,13 +45,21 @@ const getMyHouse = asyncHandler(async (req, res) => {
           hasBroker: true,
           brokers: { $elemMatch: { broker: req.user._id } },
         }
+  const count = await House.countDocuments(queryObj)
 
   const houses = await House.find(queryObj)
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
   if (!houses) {
     res.status(404)
     throw new Error("House not found")
   }
-  res.status(200).json(houses)
+  res.status(200).json({
+    page,
+    pages: Math.ceil(count / pageSize),
+    result: houses.length,
+    houses,
+  })
 })
 
 const createHouse = asyncHandler(async (req, res) => {

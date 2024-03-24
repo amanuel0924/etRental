@@ -39,10 +39,6 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "default.jpg",
     },
-    Verified: {
-      type: Boolean,
-      default: false,
-    },
 
     passwordResetToken: String,
     passwordResetExpiers: String,

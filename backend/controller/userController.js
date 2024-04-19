@@ -11,14 +11,9 @@ const hashPassword = async (password) => {
 }
 
 export const register = asyncHandler(async (req, res, next) => {
-  const { name, email, role, password, image } = req.body
+  const { name, email, password } = req.body
 
-  if (role === "super" || role === "admin") {
-    res.status(400)
-    throw new Error("you can't register as super or admin")
-  }
-
-  if (!name || !email || !password || !image) {
+  if (!name || !email || !password) {
     res.status(400)
     throw new Error("Please add all fields")
   }
@@ -34,9 +29,6 @@ export const register = asyncHandler(async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    role,
-    image,
-    verified: role === "super" || role === "admin" ? true : false,
   })
   if (user) {
     generateToken(res, user._id)
@@ -91,7 +83,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
 
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body
-
+  console.log(req.body)
   const user = await User.findOne({ email })
 
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -322,9 +314,7 @@ export const forgotePassword = asyncHandler(async (req, res, next) => {
   }
   const resetToken = user.createPasswordResetToken()
   await user.save({ validateBeforeSave: false })
-  const resetUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/users/reset/${resetToken}`
+  const resetUrl = `${req.protocol}://localhost:3000/resetPassword/${resetToken}`
   const message = `Forgot your password? submit a put request with your new password : ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`
   try {
     await sendEmail({
@@ -364,6 +354,6 @@ export const reset = asyncHandler(async (req, res, next) => {
   user.passwordResetToken = undefined
   user.passwordResetExpiers = undefined
   await user.save()
-  generateToken(res, user._id)
+
   res.status(200).json({ message: "password reset successfully" })
 })

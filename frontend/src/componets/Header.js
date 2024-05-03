@@ -37,32 +37,14 @@ const Header = () => {
           <SearchHeader />
           <Link
             to=""
-            spy={true}
-            smooth={true}
-            offset={50}
-            duration={500}
             className="  duration-200 hover:scale-105 hover:underline"
           >
             Houses
           </Link>
-          <Link
-            to=""
-            spy={true}
-            smooth={true}
-            offset={50}
-            duration={500}
-            className=" duration-200 hover:scale-105 hover:underline"
-          >
+          <Link to="" className=" duration-200 hover:scale-105 hover:underline">
             Saved
           </Link>
-          <Link
-            to=""
-            spy={true}
-            smooth={true}
-            offset={50}
-            duration={500}
-            className=" duration-200 hover:scale-105 hover:underline"
-          >
+          <Link to="" className=" duration-200 hover:scale-105 hover:underline">
             Sign in
           </Link>
         </div>

@@ -16,15 +16,20 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import ForgotePassword from "./pages/ForgotePassword"
 import ResetPassword from "./pages/ResetPassword"
+import Dashboard from "./pages/admin/Dashboard"
+import Layout from "./componets/Layout"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route index={true} path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/resetPassword/:token" element={<ResetPassword />} />
-      <Route path="/forgotPassword" element={<ForgotePassword />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/resetPassword/:token" element={<ResetPassword />} />
+        <Route path="/forgotPassword" element={<ForgotePassword />} />
+      </Route>
+      <Route path="/dashboard/*" element={<Dashboard />} />
     </Route>
   )
 )

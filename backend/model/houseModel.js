@@ -57,6 +57,10 @@ const houseSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
     siteLocation: {
       type: String,
       required: true,

@@ -15,6 +15,7 @@ const userValidation = (req, res, next) => {
       .error(() => {
         return { message: "Enter a valid email address." }
       }),
+    phoneNumber: Joi.string().trim().required(),
     password: Joi.string()
       .trim()
       .min(8)

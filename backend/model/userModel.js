@@ -35,6 +35,10 @@ const userSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
     image: {
       type: String,
       default: "default.jpg",

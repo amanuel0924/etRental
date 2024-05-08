@@ -37,6 +37,26 @@ export const userApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    createUser: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/createUser`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    getAllUsers: builder.query({
+      query: ({ pageNumber, keyword }) => ({
+        url: `${USER_URL}/`,
+        method: "GET",
+        params: { pageNumber, keyword },
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `${USER_URL}/${id}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 })
 
@@ -46,4 +66,7 @@ export const {
   useLogoutMutation,
   useForgotePasswordMutation,
   useResetPasswordMutation,
+  useCreateUserMutation,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
 } = userApi

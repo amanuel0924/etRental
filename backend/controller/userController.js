@@ -47,8 +47,8 @@ export const register = asyncHandler(async (req, res, next) => {
 })
 
 export const createUser = asyncHandler(async (req, res, next) => {
-  const { name, email, password, role } = req.body
-  if (!name || !email || !password) {
+  const { name, email, password, role, phone } = req.body
+  if (!name || !email || !password || !phone) {
     res.status(400)
     throw new Error("Please add all fields")
   }
@@ -67,6 +67,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
     password: hashedPassword,
     role: role,
     verified: true,
+    phoneNumber: phone,
   })
   if (user) {
     res.status(201).json({
@@ -74,6 +75,7 @@ export const createUser = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      phoneNumber: user.phoneNumber,
     })
   } else {
     res.status(400)
@@ -114,7 +116,7 @@ export const logout = asyncHandler(async (req, res, next) => {
 })
 
 export const getAlluser = asyncHandler(async (req, res, next) => {
-  const pageSize = 2
+  const pageSize = 8
   const page = Number(req.query.pageNumber) || 1
   const queryObj = req.query.keyword
     ? {

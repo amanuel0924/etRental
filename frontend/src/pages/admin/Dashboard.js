@@ -12,6 +12,7 @@ const Dashboard = () => {
       <Route element={<DashboredLayout />}>
         <Route index path="overveiw" element={<Overveiw />} />
         <Route path="users" element={<Users />} />
+        <Route path="users/:pageNumber" element={<Users />} />
         <Route path="houses" element={<Houses />} />
         <Route path="reports" element={<Reports />} />
         <Route path="forms" element={<Forms />} />

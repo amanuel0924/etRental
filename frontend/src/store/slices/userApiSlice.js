@@ -57,6 +57,19 @@ export const userApi = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getSingleuser: builder.query({
+      query: (id) => ({
+        url: `${USER_URL}/${id}`,
+        method: "GET",
+      }),
+    }),
+    updateUser: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/${data.id}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
   }),
 })
 
@@ -69,4 +82,6 @@ export const {
   useCreateUserMutation,
   useGetAllUsersQuery,
   useDeleteUserMutation,
+  useGetSingleuserQuery,
+  useUpdateUserMutation,
 } = userApi

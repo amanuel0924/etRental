@@ -123,7 +123,15 @@ const updateHouse = asyncHandler(async (req, res) => {
     throw new Error("you can't edit other's house")
   }
 
-  const allowedUpdates = ["name", "description", "price", "image"]
+  const allowedUpdates = [
+    "name",
+    "description",
+    "price",
+    "image",
+    "type",
+    "category",
+    "siteLocation",
+  ]
   const updates = Object.keys(req.body).reduce((acc, key) => {
     if (allowedUpdates.includes(key)) {
       acc[key] = req.body[key]

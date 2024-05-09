@@ -170,12 +170,13 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
   }
 })
 export const updateUserProfile = asyncHandler(async (req, res, next) => {
-  const { name, email, password, image } = req.body
+  const { name, email, password, image, phone } = req.body
 
   let updatedFields = {}
   if (name) updatedFields.name = name
   if (email) updatedFields.email = email
   if (image) updatedFields.image = image
+  if (phone) updatedFields.phoneNumber = phone
   if (password) {
     const salt = await bcrypt.genSalt(10)
     updatedFields.password = await bcrypt.hash(password, salt)
@@ -186,7 +187,7 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
     updatedFields,
     {
       new: true,
-      runValidators: true,
+      runValidators: false,
     }
   )
   if (updatedUser) {
@@ -197,6 +198,7 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
       email: updatedUser.email,
       role: updatedUser.role,
       image: updatedUser.image,
+      phoneNumber: updatedUser.phoneNumber,
     })
   } else {
     res.status(404)
@@ -252,7 +254,7 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 })
 
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const { name, email, image } = req.body
+  const { name, email, image, phone } = req.body
   const user = await User.findById(req.params.id)
 
   if (!user) {
@@ -267,6 +269,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   user.name = name || user.name
   user.email = email || user.email
   user.image = image || user.image
+  user.phoneNumber = phone || user.phoneNumber
   const updatedUser = await user.save()
   res.status(200).json(updatedUser)
 })

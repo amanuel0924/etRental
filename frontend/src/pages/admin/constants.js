@@ -41,6 +41,27 @@ export const DASHBOARD_SIDEBAR_LINKS = [
   },
 ]
 
+export const LANDLORD_BROKER_DASHBOARD_SIDEBAR_LINKS = [
+  {
+    key: "my-houses",
+    label: "My Houses",
+    path: "my-houses",
+    icon: <HiOutlineViewGrid />,
+  },
+  {
+    key: "pending",
+    label: "Pending Requests",
+    path: "pending-requests",
+    icon: <HiOutlineOfficeBuilding />,
+  },
+  {
+    key: "forms",
+    label: "Forms",
+    path: "house/forms",
+    icon: <HiOutlineDocumentText />,
+  },
+]
+
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
   {
     key: "settings",

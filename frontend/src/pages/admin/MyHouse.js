@@ -142,6 +142,13 @@ function MyHouse() {
                             >
                               <FaEdit size={20} />{" "}
                             </Link>
+                            <Link
+                              to={`/dashboard/house/${item._id}`}
+                              type="button"
+                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent dark:text-zinc-800 text-yellow-500 hover:text-yellow-700 disabled:opacity-50 disabled:pointer-events-none hover:scale-110 "
+                            >
+                              Details
+                            </Link>
 
                             <button
                               type="button"

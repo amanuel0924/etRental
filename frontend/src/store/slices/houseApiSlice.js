@@ -42,6 +42,20 @@ export const houseApi = apiSlice.injectEndpoints({
         method: "PUT",
       }),
     }),
+    acceptbroker: builder.mutation({
+      query: (data) => ({
+        url: `${HOUSE_URL}/acceptBrokerRequest`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+    rejectBroker: builder.mutation({
+      query: (data) => ({
+        url: `${HOUSE_URL}/rejectBrokerRequest`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 })
 
@@ -52,4 +66,6 @@ export const {
   useGetSingleHouseQuery,
   useUpdateHouseMutation,
   useLockAndUnlockHouseMutation,
+  useAcceptbrokerMutation,
+  useRejectBrokerMutation,
 } = houseApi

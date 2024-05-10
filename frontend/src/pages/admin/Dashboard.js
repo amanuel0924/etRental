@@ -9,6 +9,7 @@ import UpdateUser from "./UpdateUser"
 import HouseForm from "./HouseForm"
 import MyHouse from "./MyHouse"
 import UpdateHouse from "./UpdateHouse"
+import HouseDetail from "./HouseDetail"
 
 const Dashboard = () => {
   return (
@@ -25,6 +26,7 @@ const Dashboard = () => {
         <Route path="pending-requests" element={<Forms />} />
         <Route path="house/forms" element={<HouseForm />} />
         <Route path="house/update/:id" element={<UpdateHouse />} />
+        <Route path="house/:id" element={<HouseDetail />} />
       </Route>
     </Routes>
   )

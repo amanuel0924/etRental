@@ -3,7 +3,7 @@ import House from "./../model/houseModel.js"
 import PendingOrder from "../model/pendingOrderModel.js"
 import { uploadHousePhoto, resize } from "./uploadController.js"
 const getAllHouse = asyncHandler(async (req, res) => {
-  const pageSize = 2
+  const pageSize = 8
   const page = Number(req.query.pageNumber) || 1
   const queryObj = req.query.keyword
     ? {
@@ -42,9 +42,19 @@ const getMyHouse = asyncHandler(async (req, res) => {
         }
       : {
           active: true,
-          hasBroker: true,
-          brokers: { $elemMatch: { broker: req.user._id } },
+          $or: [
+            { user: req.user._id },
+            {
+              brokers: {
+                $elemMatch: {
+                  broker: req.user._id,
+                  status: "accepted",
+                },
+              },
+            },
+          ],
         }
+
   const count = await House.countDocuments(queryObj)
 
   const houses = await House.find(queryObj)

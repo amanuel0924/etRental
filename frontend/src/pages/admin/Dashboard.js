@@ -10,6 +10,7 @@ import HouseForm from "./HouseForm"
 import MyHouse from "./MyHouse"
 import UpdateHouse from "./UpdateHouse"
 import HouseDetail from "./HouseDetail"
+import PendingRequest from "./PendingRequest"
 
 const Dashboard = () => {
   return (
@@ -23,10 +24,10 @@ const Dashboard = () => {
         <Route path="reports" element={<Reports />} />
         <Route path="forms" element={<Forms />} />
         <Route path="my-houses" element={<MyHouse />} />
-        <Route path="pending-requests" element={<Forms />} />
         <Route path="house/forms" element={<HouseForm />} />
         <Route path="house/update/:id" element={<UpdateHouse />} />
         <Route path="house/:id" element={<HouseDetail />} />
+        <Route path="pending" element={<PendingRequest />} />
       </Route>
     </Routes>
   )

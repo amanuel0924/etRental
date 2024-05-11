@@ -5,7 +5,7 @@ import {
   LANDLORD_BROKER_DASHBOARD_SIDEBAR_LINKS,
   DASHBOARD_SIDEBAR_LINKS,
 } from "./constants"
-import { NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { useSelector } from "react-redux"
 const linkClass =
   "flex items-center gap-2 font-light px-3 py-2 hover:bg-gray-700 hover:no-underline active:bg-gray-600 rounded-sm text-base"
@@ -14,10 +14,13 @@ const Sidebar = () => {
   const user = useSelector((state) => state.auth.user)
   return (
     <div className="flex flex-col p-3 w-60 bg-gray-900 text-white ">
-      <div className="flex items-center justify-center text-2xl font-bold space-x-3 ">
+      <Link
+        to={`/`}
+        className="flex items-center justify-center text-2xl font-bold space-x-3 "
+      >
         <FcComboChart size={29} />
         <span> etRental</span>
-      </div>
+      </Link>
       <div className="flex-1 flex flex-col gap-0.5 pt-6 ">
         {(user.role === "admin" || user.role === "super") &&
           DASHBOARD_SIDEBAR_LINKS.map((item) => {

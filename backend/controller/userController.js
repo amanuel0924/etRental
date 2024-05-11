@@ -11,9 +11,10 @@ const hashPassword = async (password) => {
 }
 
 export const register = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body
+  console.log(req.body)
+  const { name, email, password, phone, role } = req.body
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !phone) {
     res.status(400)
     throw new Error("Please add all fields")
   }
@@ -29,6 +30,8 @@ export const register = asyncHandler(async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
+    role: role,
+    phoneNumber: phone,
   })
   if (user) {
     generateToken(res, user._id)
@@ -39,6 +42,7 @@ export const register = asyncHandler(async (req, res, next) => {
       email: user.email,
       role: user.role,
       image: user.image,
+      phoneNumber: user.phoneNumber,
     })
   } else {
     res.status(400)
@@ -86,9 +90,15 @@ export const createUser = asyncHandler(async (req, res, next) => {
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body
   console.log(req.body)
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email }).select("+active")
 
   if (user && (await bcrypt.compare(password, user.password))) {
+    //handel if user is not active return error
+    if (!user?.active) {
+      res.status(401)
+      throw new Error("Your account is deactivated, please contact admin")
+    }
+
     generateToken(res, user._id)
 
     res.status(201).json({
@@ -162,6 +172,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      phoneNumber: user.phoneNumber,
       image: user.image,
     })
   } else {

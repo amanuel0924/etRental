@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import {
   IoImageOutline,
@@ -17,12 +17,13 @@ import {
 } from "../../store/slices/houseApiSlice"
 import { useParams } from "react-router-dom"
 import { toast } from "react-toastify"
+import PendingForm from "../../componets/PendingForm"
 
 const HouseDetail = () => {
   const user = useSelector((state) => state.auth.user)
   const { id } = useParams()
   const { data, error, isLoading, refetch } = useGetSingleHouseQuery(id)
-  const [currentImage, setCurrentImage] = useState(data?.image[0])
+  const [currentImage, setCurrentImage] = useState("")
 
   const [acceptBroker] = useAcceptbrokerMutation()
   const [rejectBroker] = useRejectBrokerMutation()
@@ -51,6 +52,11 @@ const HouseDetail = () => {
   }
   console.log(data)
 
+  useEffect(() => {
+    if (data) {
+      setCurrentImage(data.image[0])
+    }
+  }, [data])
   return (
     <div className="text-gray-700 body-font py-20  bg-white border-4 h-full overflow-scroll w-full flex flex-col items-center">
       <div className="container px-5  mx-auto border-4">
@@ -115,22 +121,6 @@ const HouseDetail = () => {
       </div>
       {user?.role === "landlord" && (
         <div className="flex flex-col md:flex-row -mx-4 w-full">
-          <div className="md:flex-1 px-4 my-4">
-            <h2 className="text-2xl font-bold text-teal-700 dark:text-white mb-2">
-              feedbacks
-            </h2>
-            <div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
-                sime feed bakcs
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
-                sime feedbakcs
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
-                sime feed bakcs
-              </p>
-            </div>
-          </div>
           <div className=" md:flex-1 px-4  my-4 h-fit shadow-lg">
             <h2 className=" m-2 font-bold text-xl">Broker requests</h2>
             <div className=" rounded-lg  dark:bg-gray-700 mb-4 overflow-auto ">
@@ -214,6 +204,24 @@ const HouseDetail = () => {
           </div>
         </div>
       )}
+      <PendingForm id={id} />
+
+      <div className="md:flex-1 px-4 my-4">
+        <h2 className="text-2xl font-bold text-teal-700 dark:text-white mb-2">
+          feedbacks
+        </h2>
+        <div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
+            sime feed bakcs
+          </p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
+            sime feedbakcs
+          </p>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mt-8">
+            sime feed bakcs
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

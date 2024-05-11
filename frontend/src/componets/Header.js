@@ -1,13 +1,34 @@
-import React, { useState } from "react"
+import React, { useState, Fragment } from "react"
 import Logo from "./../assets/logo.png"
 import SearchHeader from "./SearchHeader"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { FaBars, FaXmark } from "react-icons/fa6"
+import { useSelector, useDispatch } from "react-redux"
+import { logout } from "../store/slices/authSlice"
+import { useLogoutMutation } from "../store/slices/userApiSlice"
+import Loader from "./Loader"
+import { toast } from "react-toastify"
+import { Menu, Transition } from "@headlessui/react"
+import classNames from "classnames"
 
 const Header = () => {
   const [menu, setMenu] = useState(false)
+  const user = useSelector((state) => state.auth.user)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const handleMenu = () => {
     setMenu(!menu)
+  }
+  const [logoutUser] = useLogoutMutation()
+  const logoutHandler = async () => {
+    try {
+      await logoutUser().unwrap()
+      dispatch(logout())
+      toast.success("Logout successfully")
+      navigate("/login")
+    } catch (error) {
+      toast.error(error.data.message || error.message)
+    }
   }
 
   const location = useLocation()
@@ -15,14 +36,84 @@ const Header = () => {
   return (
     <div className="h-16 shadow-md">
       <div className="h-full flex  container mx-auto items-center justify-between">
-        <div className="z-40 px-4">
+        <Link to={"/"} className="z-40 px-4">
           <img src={Logo} alt="logo" className=" min-w-fit h-4" />
-        </div>
+        </Link>
         {<SearchHeader hide={1} />}
-        <div className=" space-x-3 font-semibold text-gray-600 hidden mx-4 md:block">
-          <Link to="/login">Houses</Link>
-          <Link to="/login">Saved</Link>
-          <Link to="/login">Sign in</Link>
+        <div className=" space-x-3 items-center font-semibold text-gray-600 hidden mx-4 md:flex">
+          <Link to="/houses">Houses</Link>
+          <Link to="">Saved</Link>
+          {user ? (
+            <Menu as="div" className="relative">
+              <div>
+                <Menu.Button className="ml-2 bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-400">
+                  <span className="sr-only">Open user menu</span>
+                  <div
+                    className="h-10 w-10 rounded-full bg-sky-500 bg-cover bg-no-repeat bg-center"
+                    style={{
+                      backgroundImage:
+                        'url("https://source.unsplash.com/80x80?face")',
+                    }}
+                  >
+                    <span className="sr-only">Marc Backes</span>
+                  </div>
+                </Menu.Button>
+              </div>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="origin-top-right z-10 absolute right-0 mt-2 w-48 rounded-sm shadow-md p-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <div
+                        onClick={() => navigate("/profile")}
+                        className={classNames(
+                          active && "bg-gray-100",
+                          "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                        )}
+                      >
+                        Your Profile
+                      </div>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <div
+                        onClick={() => navigate("/settings")}
+                        className={classNames(
+                          active && "bg-gray-100",
+                          "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                        )}
+                      >
+                        Settings
+                      </div>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <div
+                        onClick={logoutHandler}
+                        className={classNames(
+                          active && "bg-gray-100",
+                          "active:bg-gray-200  rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                        )}
+                      >
+                        Log out
+                      </div>
+                    )}
+                  </Menu.Item>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          ) : (
+            <Link to="/login">Sign in</Link>
+          )}
         </div>
         <button
           onClick={handleMenu}
@@ -44,9 +135,22 @@ const Header = () => {
           <Link to="" className=" duration-200 hover:scale-105 hover:underline">
             Saved
           </Link>
-          <Link to="" className=" duration-200 hover:scale-105 hover:underline">
-            Sign in
-          </Link>
+          {user ? (
+            <Link
+              to=""
+              onClick={logoutHandler}
+              className=" duration-200 hover:scale-105 hover:underline"
+            >
+              Logout
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className=" duration-200 hover:scale-105 hover:underline"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       )}
     </div>

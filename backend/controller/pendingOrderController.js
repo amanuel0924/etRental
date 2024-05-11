@@ -47,7 +47,33 @@ const getMyPending = asyncHandler(async (req, res) => {
 })
 
 const getAllPending = asyncHandler(async (req, res) => {
-  const pending = await PendingOrder.find({}).populate("houseEntityId")
+  // get all pending for landlord for his houses if house has broker
+  const queryObj =
+    req.user.role === "landlord"
+      ? {
+          hasBroker: false,
+          user: req.user._id,
+          active: true,
+        }
+      : {
+          active: true,
+          $or: [
+            { user: req.user._id },
+            {
+              brokers: {
+                $elemMatch: {
+                  broker: req.user._id,
+                  status: "accepted",
+                },
+              },
+            },
+          ],
+        }
+  const houses = await House.find(queryObj)
+
+  const pending = await PendingOrder.find({
+    houseEntityId: { $in: houses.map((house) => house._id) },
+  }).populate("tenetId")
   if (!pending) {
     res.status(404)
     throw new Error("Pending not found")

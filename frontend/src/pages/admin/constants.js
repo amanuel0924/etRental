@@ -51,7 +51,7 @@ export const LANDLORD_BROKER_DASHBOARD_SIDEBAR_LINKS = [
   {
     key: "pending",
     label: "Pending Requests",
-    path: "pending-requests",
+    path: "pending",
     icon: <HiOutlineOfficeBuilding />,
   },
   {

@@ -9,12 +9,16 @@ import {
   acceptCounterOffer,
   rejectCounterOffer,
   getPendingOrdersForHouse,
+  getAllPending,
 } from "./../controller/pendingOrderController.js"
 import { protect, allowedTO } from "./../middleware/authMiddleware.js"
 
 const router = express.Router()
 
-router.route("/").post(protect, allowedTO("renter"), createPending)
+router
+  .route("/")
+  .post(protect, allowedTO("renter"), createPending)
+  .get(protect, getAllPending)
 router.route("/myPending").get(protect, getMyPending)
 router
   .route("/:id")

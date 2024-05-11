@@ -10,6 +10,13 @@ export const houseApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getAllHouse: builder.query({
+      query: ({ pageNumber, keyword }) => ({
+        url: `${HOUSE_URL}/`,
+        method: "GET",
+        params: { pageNumber, keyword },
+      }),
+    }),
     getMyhouses: builder.query({
       query: () => ({
         url: `${HOUSE_URL}/myHouse`,
@@ -68,4 +75,5 @@ export const {
   useLockAndUnlockHouseMutation,
   useAcceptbrokerMutation,
   useRejectBrokerMutation,
+  useGetAllHouseQuery,
 } = houseApi

@@ -8,8 +8,9 @@ import {
   IoMailOutline,
   IoChevronForwardOutline,
 } from "react-icons/io5"
+import { Link } from "react-router-dom"
 
-const CardHome = () => {
+const CardHome = ({ house }) => {
   return (
     <section className="text-gray-700 body-font overflow-hidden bg-white border-4">
       <div className="container px-5 py-24 mx-auto border-4">
@@ -59,13 +60,16 @@ const CardHome = () => {
             </p>
             <div className="flex flex-row justify-between md:flex-col md:space-y-2 my-5 ">
               <div>
-                <button className="   border-2 border-gray-900 text-sm outline-none  py-1   rounded-full px-3 ">
+                <Link
+                  to={`/houses/detail/${house._id}`}
+                  className="   border-2 border-gray-900 text-sm outline-none  py-1   rounded-full px-3 "
+                >
                   Details & send Offer
-                </button>
+                </Link>
               </div>
-              <spa className="font-thin text-sm px-2">
+              <span className="font-thin text-sm px-2">
                 Listed on 12th jan 2024
-              </spa>
+              </span>
             </div>
           </div>
         </div>

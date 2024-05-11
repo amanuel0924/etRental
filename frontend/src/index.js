@@ -18,6 +18,9 @@ import ForgotePassword from "./pages/ForgotePassword"
 import ResetPassword from "./pages/ResetPassword"
 import Dashboard from "./pages/admin/Dashboard"
 import Layout from "./componets/Layout"
+import HouseList from "./pages/HouseList"
+import HouseDetail from "./pages/admin/HouseDetail"
+import Profile from "./pages/Profile"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,6 +31,10 @@ const router = createBrowserRouter(
         <Route path="/register" element={<Register />} />
         <Route path="/resetPassword/:token" element={<ResetPassword />} />
         <Route path="/forgotPassword" element={<ForgotePassword />} />
+        <Route path="/houses" element={<HouseList />} />
+        <Route path="/houses/:pageNumber" element={<HouseList />} />
+        <Route path="/houses/detail/:id" element={<HouseDetail />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="/dashboard/*" element={<Dashboard />} />
     </Route>

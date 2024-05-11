@@ -1,14 +1,35 @@
 import React from "react"
 import Loader from "../../componets/Loader"
 import { toast } from "react-toastify"
-import { useGetAllPendingQuery } from "../../store/slices/pendingSlice"
+import {
+  useGetAllPendingQuery,
+  useAcceptRenterMutation,
+  useRejectRenterMutation,
+} from "../../store/slices/pendingSlice.js"
 import { Link } from "react-router-dom"
 
 const PendingRequest = () => {
-  const { data, isLoading, error } = useGetAllPendingQuery()
+  const { data, isLoading, error, refetch } = useGetAllPendingQuery()
+  const [acceptRenter, { isLoading: acceptLoading }] = useAcceptRenterMutation()
+  const [rejectRenter, { isLoading: rejectLoading }] = useRejectRenterMutation()
 
-  if (data) {
-    console.log(data)
+  const handleAccept = async (id) => {
+    try {
+      await acceptRenter(id)
+      toast.success("Renter accepted successfully")
+      refetch()
+    } catch (error) {
+      toast.error(error?.data?.message)
+    }
+  }
+  const handleReject = async (id) => {
+    try {
+      await rejectRenter(id)
+      toast.success("Renter rejected successfully")
+      refetch()
+    } catch (error) {
+      toast.error(error?.data?.message)
+    }
   }
 
   return (
@@ -84,30 +105,46 @@ const PendingRequest = () => {
                           }`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {pending.tenetId.name}
+                            {pending?.tenetId.name}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending.bidPrice}
+                            {pending?.bidPrice}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending.startDate}
+                            {pending?.startDate}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending.endDate}
+                            {pending?.endDate}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending.status}
+                            {pending?.status}
                           </td>
                           <td className="text-sm text-gray-900 space-x-2 font-light px-6 py-4 whitespace-nowrap">
-                            <button className=" px-3 py-1 bg-teal-800 outline-none text-white border-0 ">
-                              accept
+                            <button
+                              className=" px-3 py-1 bg-teal-800 outline-none text-white border-0 "
+                              onClick={() => handleAccept(pending?._id)}
+                              disabled={
+                                pending.status === "rejected" ||
+                                pending.status === "accepted" ||
+                                pending.status === "couterOffer"
+                              }
+                            >
+                              {acceptLoading ? <Loader /> : "accept"}
                             </button>
-                            <button className=" px-3 py-1 bg-red-500 outline-none text-white border-0 ">
-                              reject
+                            <button
+                              className=" px-3 py-1 bg-red-500 outline-none text-white border-0 "
+                              onClick={() => handleReject(pending?._id)}
+                              disabled={
+                                pending.status === "rejected" ||
+                                pending.status === "accepted" ||
+                                pending.status === "couterOffer"
+                              }
+                            >
+                              {rejectLoading ? <Loader /> : "reject"}
                             </button>
                             <Link
                               className=" px-3 py-1 bg-red-500 outline-none text-white border-0 "
-                              to={`/pending/${pending._id}`}
+                              to={`/dashboard/pending/${pending._id}`}
                             >
                               Details
                             </Link>

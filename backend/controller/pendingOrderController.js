@@ -121,11 +121,12 @@ const acceptPending = asyncHandler(async (req, res) => {
     res.status(403)
     throw new Error("House is not available")
   }
+
   let broker
   if (house.hasBroker) {
     broker = house.brokers.find((broker) => broker.status === "accepted")
   }
-  if (req.user._id.toString() !== broker._id.toString()) {
+  if (broker && req.user._id.toString() !== broker._id.toString()) {
     res.status(403)
     throw new Error("House has broker")
   }

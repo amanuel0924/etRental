@@ -11,6 +11,7 @@ import MyHouse from "./MyHouse"
 import UpdateHouse from "./UpdateHouse"
 import HouseDetail from "./HouseDetail"
 import PendingRequest from "./PendingRequest"
+import PendingDetail from "../PendingDetail"
 
 const Dashboard = () => {
   return (
@@ -28,6 +29,7 @@ const Dashboard = () => {
         <Route path="house/update/:id" element={<UpdateHouse />} />
         <Route path="house/:id" element={<HouseDetail />} />
         <Route path="pending" element={<PendingRequest />} />
+        <Route path="pending/:id" element={<PendingDetail />} />
       </Route>
     </Routes>
   )

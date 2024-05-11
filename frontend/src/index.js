@@ -21,6 +21,7 @@ import Layout from "./componets/Layout"
 import HouseList from "./pages/HouseList"
 import HouseDetail from "./pages/admin/HouseDetail"
 import Profile from "./pages/Profile"
+import PendingDetail from "./pages/PendingDetail"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
         <Route path="/houses/:pageNumber" element={<HouseList />} />
         <Route path="/houses/detail/:id" element={<HouseDetail />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/pending/:id" element={<PendingDetail />} />
       </Route>
       <Route path="/dashboard/*" element={<Dashboard />} />
     </Route>

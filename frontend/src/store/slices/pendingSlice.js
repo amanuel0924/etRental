@@ -16,7 +16,6 @@ export const pendingApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-
     getSinglePending: builder.query({
       query: (id) => ({
         url: `${PENDING_URL}/${id}`,
@@ -25,17 +24,34 @@ export const pendingApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Pending"],
     }),
     acceptRenter: builder.mutation({
-      query: (data) => ({
-        url: `${PENDING_URL}/acceptBrokerRequest`,
-        method: "POST",
-        body: data,
+      query: (id) => ({
+        url: `${PENDING_URL}/${id}/accept`,
+        method: "PUT",
       }),
     }),
     rejectRenter: builder.mutation({
+      query: (id) => ({
+        url: `${PENDING_URL}/${id}/reject`,
+        method: "PUT",
+      }),
+    }),
+    prorposeCounterOffer: builder.mutation({
       query: (data) => ({
-        url: `${PENDING_URL}/rejectBrokerRequest`,
-        method: "POST",
-        body: data,
+        url: `${PENDING_URL}/${data.id}/counterOffer`,
+        method: "PUT",
+        body: { counterOfferPrice: Number(data.counterOfferPrice) },
+      }),
+    }),
+    acceptCounterOffer: builder.mutation({
+      query: (id) => ({
+        url: `${PENDING_URL}/${id}/acceptCounterOffer`,
+        method: "PUT",
+      }),
+    }),
+    rejectCounterOffer: builder.mutation({
+      query: (id) => ({
+        url: `${PENDING_URL}/${id}/rejectCounterOffer`,
+        method: "PUT",
       }),
     }),
   }),
@@ -47,4 +63,7 @@ export const {
   useGetSinglePendingQuery,
   useAcceptRenterMutation,
   useRejectRenterMutation,
+  useProrposeCounterOfferMutation,
+  useAcceptCounterOfferMutation,
+  useRejectCounterOfferMutation,
 } = pendingApi

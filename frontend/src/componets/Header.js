@@ -82,19 +82,21 @@ const Header = () => {
                       </div>
                     )}
                   </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <div
-                        onClick={() => navigate("/settings")}
-                        className={classNames(
-                          active && "bg-gray-100",
-                          "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
-                        )}
-                      >
-                        Settings
-                      </div>
-                    )}
-                  </Menu.Item>
+                  {user.role === "renter" && (
+                    <Menu.Item>
+                      {({ active }) => (
+                        <div
+                          onClick={() => navigate("/pending")}
+                          className={classNames(
+                            active && "bg-gray-100",
+                            "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                          )}
+                        >
+                          My Requests
+                        </div>
+                      )}
+                    </Menu.Item>
+                  )}
                   <Menu.Item>
                     {({ active }) => (
                       <div

@@ -1,10 +1,25 @@
 import React from "react"
 import Loader from "../componets/Loader"
 import { useGetMyPendingQuery } from "../store/slices/pendingSlice.js"
+import { useMakeAvailableHouseMutation } from "../store/slices/houseApiSlice.js"
 import { Link } from "react-router-dom"
+import { toast } from "react-toastify"
 
-const MyPending = () => {
-  const { data, isLoading, error } = useGetMyPendingQuery()
+const RentedHouse = () => {
+  const { data: res, isLoading, error, refetch } = useGetMyPendingQuery()
+  const data = res?.filter((item) => item.status === "accepted")
+  const [makeAvailableHouse, { isLoading: makeAvloading }] =
+    useMakeAvailableHouseMutation()
+
+  const makeAvailableHouseHandler = async (id) => {
+    try {
+      await makeAvailableHouse(id)
+      toast.success("house available")
+      refetch()
+    } catch (error) {
+      toast.error(error.data.message || error.message)
+    }
+  }
 
   return (
     <div>
@@ -32,7 +47,7 @@ const MyPending = () => {
                       scope="col"
                       className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                     >
-                      bid
+                      rented price
                     </th>
                     <th
                       scope="col"
@@ -50,7 +65,7 @@ const MyPending = () => {
                       scope="col"
                       className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
                     >
-                      status
+                      house status
                     </th>
                     <th
                       scope="col"
@@ -64,7 +79,7 @@ const MyPending = () => {
                   {data?.length === 0 ? (
                     <tr>
                       <td colSpan="4" className="text-center">
-                        No request
+                        No RentedHouse
                       </td>
                     </tr>
                   ) : (
@@ -82,7 +97,9 @@ const MyPending = () => {
                             {pending?.houseEntityId?.name}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending?.bidPrice}
+                            {pending?.hasCouterOffer
+                              ? pending?.counterOfferPrice
+                              : pending?.bidPrice}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                             {pending?.startDate}
@@ -91,15 +108,29 @@ const MyPending = () => {
                             {pending?.endDate}
                           </td>
                           <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                            {pending?.status}
+                            {pending?.houseEntityId?.houseStatus}
                           </td>
                           <td className="text-sm text-gray-900 space-x-2 font-light px-6 py-4 whitespace-nowrap">
                             <Link
                               className=" px-3 py-1 bg-red-500 outline-none text-white border-0 "
-                              to={`/pending/${pending._id}`}
+                              to={`/houses/detail/${pending?.houseEntityId?._id}`}
                             >
                               Details
                             </Link>
+                            {makeAvloading ? (
+                              <Loader />
+                            ) : (
+                              <button
+                                className=" px-3 py-1 bg-gray-700 outline-none text-white border-0 "
+                                onClick={() =>
+                                  makeAvailableHouseHandler(
+                                    pending?.houseEntityId?._id
+                                  )
+                                }
+                              >
+                                leave
+                              </button>
+                            )}
                           </td>
                         </tr>
                       )
@@ -115,4 +146,4 @@ const MyPending = () => {
   )
 }
 
-export default MyPending
+export default RentedHouse

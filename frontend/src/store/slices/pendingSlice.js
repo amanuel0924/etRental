@@ -54,6 +54,12 @@ export const pendingApi = apiSlice.injectEndpoints({
         method: "PUT",
       }),
     }),
+    getMyPending: builder.query({
+      query: () => ({
+        url: `${PENDING_URL}/myPending`,
+        method: "GET",
+      }),
+    }),
   }),
 })
 
@@ -66,4 +72,5 @@ export const {
   useProrposeCounterOfferMutation,
   useAcceptCounterOfferMutation,
   useRejectCounterOfferMutation,
+  useGetMyPendingQuery,
 } = pendingApi

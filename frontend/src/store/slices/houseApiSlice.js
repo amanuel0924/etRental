@@ -63,6 +63,19 @@ export const houseApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    makeAvailableHouse: builder.mutation({
+      query: (id) => ({
+        url: `${HOUSE_URL}/makeHouseAvailable/${id}`,
+        method: "PUT",
+      }),
+    }),
+    createFeedback: builder.mutation({
+      query: (data) => ({
+        url: `${HOUSE_URL}/feedback`,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 })
 
@@ -76,4 +89,5 @@ export const {
   useAcceptbrokerMutation,
   useRejectBrokerMutation,
   useGetAllHouseQuery,
+  useMakeAvailableHouseMutation,
 } = houseApi

@@ -90,7 +90,7 @@ const PendingRequest = () => {
                   {data?.length === 0 ? (
                     <tr>
                       <td colSpan="4" className="text-center">
-                        No broker request
+                        No request
                       </td>
                     </tr>
                   ) : (

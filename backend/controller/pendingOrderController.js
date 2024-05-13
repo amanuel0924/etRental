@@ -73,6 +73,7 @@ const getAllPending = asyncHandler(async (req, res) => {
 
   const pending = await PendingOrder.find({
     houseEntityId: { $in: houses.map((house) => house._id) },
+    status: { $nin: ["rejected"] },
   }).populate("tenetId")
   if (!pending) {
     res.status(404)

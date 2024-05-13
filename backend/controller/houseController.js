@@ -360,7 +360,8 @@ const makeHouseAvailable = asyncHandler(async (req, res) => {
     res.status(404)
     throw new Error("House not found")
   }
-  if (req.user._id.toString() !== house.user.toString()) {
+
+  if (!house.rentershistory.includes(req.user._id.toString())) {
     res.status(403)
     throw new Error("you can't edit other's house")
   }

@@ -1,3 +1,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.side-button {
+    @apply py-2 space-x-2 w-full flex items-center justify-center border-3 rounded-sm  border-violet-950 hover:text-white hover:bg-violet-950  
+  }
+  
+  .side-card{
+    @apply bg-white  rounded-md flex flex-col w-72 space-y-4  border-2 border-gray-300
+  }
+  .side-card-header{
+    @apply flex flex-col  space-y-4 border-b-3 border-gray-200 py-4 text-violet-950 font-medium 
+  }
+  .links{
+    @apply flex flex-col font-medium    underline decoration-2 text-violet-950 space-y-2 border-gray-200  pb-4 
+  }
+  
+  
+  .pagination-container {
+    @apply flex justify-between items-center m-3 font-medium;
+  }
+  
+  .pagination-button {
+    @apply flex space-x-1 rounded-md items-center  px-3 py-2 cursor-pointer border border-solid border-gray-300 bg-white outline-none;
+  }
+  
+  .pagination-items {
+    @apply flex gap-4 justify-center;
+  }
+  
+  .pagination-item {
+    @apply rounded-md px-4 py-2 cursor-pointer border-2 border-solid border-gray-300 bg-white outline-none;
+  }
+  
+  .pagination-item.active {
+    @apply bg-violet-950 text-white;
+  }
+  
+  .pagination-button.disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+  .filter-container {
+    @apply w-full hidden md:flex justify-between items-center px-4 py-6 bg-gray-100 rounded shadow-md;
+  }
+  
+  .search-field {
+    @apply  flex flex-col  ;
+  }
+  
+  .search-field label {
+    @apply  text-sm font-medium text-gray-600;
+  }
+  
+  .search-field input {
+    @apply w-full px-3 py-2 border rounded border-gray-300 focus:outline-none focus:ring focus:ring-blue-500;
+  }
+  
+  
+  
+  .filter-option {
+    @apply flex flex-col space-x-1  ;
+  }
+  
+  .filter-option label {
+    @apply text-sm px-1 font-medium text-gray-600;
+  }
+  
+  .filter-option select {
+    @apply px-3 py-2 border rounded border-gray-300 appearance-none;
+  }
+  
+  .filter-buttons {
+    @apply mt-4 ml-2 flex justify-end gap-2;
+  }
+  
+  .filter-buttons button {
+    @apply px-4 py-2 rounded flex items-center font-medium text-white;
+  }
+  
+  .filter-buttons button:first-child {
+    @apply bg-white border-2 text-violet-950 border-violet-950 hover:bg-violet-950 hover:text-white;
+  }
+  
+  .filter-buttons button:last-child {
+    @apply bg-violet-950 hover:bg-white border-2 hover:border-violet-950 hover:text-violet-950;
+  }
+  

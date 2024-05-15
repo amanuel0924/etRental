@@ -3,7 +3,7 @@ import Logo from "./../assets/logo.png"
 import SearchHeader from "./SearchHeader"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { FaBars, FaXmark } from "react-icons/fa6"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../store/slices/authSlice"
 import { useLogoutMutation } from "../store/slices/userApiSlice"
 import { toast } from "react-toastify"
@@ -13,7 +13,8 @@ import { useGetProfileQuery } from "../store/slices/userApiSlice"
 
 const Header = () => {
   const [menu, setMenu] = useState(false)
-  const { data: user } = useGetProfileQuery()
+  const user = useSelector((state) => state.auth.user)
+  const { data } = useGetProfileQuery()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -53,7 +54,7 @@ const Header = () => {
                   <div
                     className="h-10 w-10 rounded-full bg-sky-500 bg-cover bg-no-repeat bg-center"
                     style={{
-                      backgroundImage: `url("http://localhost:6060/uploads/user/${user?.image}")`,
+                      backgroundImage: `url("http://localhost:6060/uploads/user/${data?.image}")`,
                     }}
                   >
                     <span className="sr-only">Marc Backes</span>

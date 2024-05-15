@@ -13,6 +13,7 @@ import HouseDetail from "./HouseDetail"
 import PendingRequest from "./PendingRequest"
 import PendingDetail from "../PendingDetail"
 import AdminRouter from "../../componets/AdminRoute"
+import MyHouseReport from "./MyHouseReport"
 
 const Dashboard = () => {
   return (
@@ -29,12 +30,14 @@ const Dashboard = () => {
           <Route path="reports" element={<Reports />} />
         </Route>
         <Route path="my-houses" element={<MyHouse />} />
+
         <Route path="my-houses/:pageNumber" element={<MyHouse />} />
         <Route path="house/forms" element={<HouseForm />} />
         <Route path="house/update/:id" element={<UpdateHouse />} />
         <Route path="house/:id" element={<HouseDetail />} />
         <Route path="pending" element={<PendingRequest />} />
         <Route path="pending/:id" element={<PendingDetail />} />
+        <Route path="house/my-reports" element={<MyHouseReport />} />
       </Route>
     </Routes>
   )

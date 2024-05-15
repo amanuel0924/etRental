@@ -3,19 +3,20 @@ import {
   getReportsForhouse,
   getMyReports,
   resolveReport,
+  getallReports,
 } from "../controller/reportController.js"
 import { protect, allowedTO } from "../middleware/authMiddleware.js"
 import express from "express"
 
 const router = express.Router()
 
-router.route("/").post(protect, createReport)
+router
+  .route("/")
+  .post(protect, createReport)
+  .get(protect, allowedTO("admin", "super"), getallReports)
 router
   .route("/myReports")
-  .get(protect, allowedTO("renter", "broker", "landlord"), getMyReports)
-router
-  .route("/house/:id")
-  .get(protect, allowedTO("broker", "landlord"), getReportsForhouse)
+  .get(protect, allowedTO("renter", "broker", "landlord"), getReportsForhouse)
 
 router
   .route("/resolve/:id")

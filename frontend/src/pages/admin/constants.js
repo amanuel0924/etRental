@@ -60,6 +60,12 @@ export const LANDLORD_BROKER_DASHBOARD_SIDEBAR_LINKS = [
     path: "house/forms",
     icon: <HiOutlineDocumentText />,
   },
+  {
+    key: "report",
+    label: "Reports",
+    path: "house/my-reports",
+    icon: <HiOutlineAnnotation />,
+  },
 ]
 
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [

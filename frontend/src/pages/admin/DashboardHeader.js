@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom"
 import { Menu, Transition } from "@headlessui/react"
 import { useLogoutMutation } from "../../store/slices/userApiSlice"
 import { toast } from "react-toastify"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../../store/slices/authSlice"
 import { useGetProfileQuery } from "../../store/slices/userApiSlice"
 
 const DashboardHeader = () => {
   const navigate = useNavigate()
-  const { data: user } = useGetProfileQuery()
+  const user = useSelector((state) => state.auth.user)
+  const { data } = useGetProfileQuery()
   const [logoutUser] = useLogoutMutation()
   const dispatch = useDispatch()
   const logoutHandler = async () => {
@@ -43,7 +44,7 @@ const DashboardHeader = () => {
               <div
                 className="h-10 w-10 rounded-full bg-sky-500 bg-cover bg-no-repeat bg-center"
                 style={{
-                  backgroundImage: `url("http://localhost:6060/uploads/user/${user?.image}")`,
+                  backgroundImage: `url("http://localhost:6060/uploads/user/${data?.image}")`,
                 }}
               >
                 <span className="sr-only">Marc Backes</span>

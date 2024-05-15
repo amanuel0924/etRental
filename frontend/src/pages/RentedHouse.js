@@ -1,15 +1,22 @@
-import React from "react"
+import React, { useState } from "react"
 import Loader from "../componets/Loader"
 import { useGetMyPendingQuery } from "../store/slices/pendingSlice.js"
 import { useMakeAvailableHouseMutation } from "../store/slices/houseApiSlice.js"
 import { Link } from "react-router-dom"
 import { toast } from "react-toastify"
+import { Modal } from "../componets/Modal"
+import { useCreateReportMutation } from "../store/slices/reportApisclice.js"
 
 const RentedHouse = () => {
+  const [open, setOpen] = useState(false)
+  const [type, setType] = useState("")
+  const [description, setDescription] = useState("")
+  const [id, setId] = useState("")
   const { data: res, isLoading, error, refetch } = useGetMyPendingQuery()
   const data = res?.filter((item) => item.status === "accepted")
   const [makeAvailableHouse, { isLoading: makeAvloading }] =
     useMakeAvailableHouseMutation()
+  const [report, { isLoading: reportLoading }] = useCreateReportMutation()
 
   const makeAvailableHouseHandler = async (id) => {
     try {
@@ -21,8 +28,23 @@ const RentedHouse = () => {
     }
   }
 
+  const reportHandler = async (e) => {
+    e.preventDefault()
+    if (!type || !description) {
+      toast.error("please fill all input")
+    } else {
+      try {
+        await report({ house: id, type, description })
+        toast.success("report sent successfully")
+        setOpen(false)
+      } catch (error) {
+        toast.error(error.data.message || error.message)
+      }
+    }
+  }
+
   return (
-    <div>
+    <div className="h-screen max-w-4xl mx-auto">
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -131,6 +153,19 @@ const RentedHouse = () => {
                                 leave
                               </button>
                             )}
+                            {reportLoading ? (
+                              <Loader />
+                            ) : (
+                              <button
+                                className=" px-3 py-1 bg-gray-700 outline-none text-white border-0 "
+                                onClick={() => {
+                                  setId(pending?.houseEntityId?._id)
+                                  setOpen(true)
+                                }}
+                              >
+                                Report
+                              </button>
+                            )}
                           </td>
                         </tr>
                       )
@@ -140,6 +175,61 @@ const RentedHouse = () => {
               </table>
             </div>
           </div>
+          <Modal open={open} onClose={() => setOpen(false)}>
+            {
+              <form className="  flex flex-col px-3  space-y-3">
+                <div className="flex  flex-col   mt-4 px-6  ">
+                  <label htmlFor="rating" className=" font-semibold text-lg">
+                    Type
+                  </label>
+                  <select
+                    value={type}
+                    id="rating"
+                    onChange={(e) => setType(e.target.value)}
+                    className="p-2  border-2 rounded-md border-gray-700 focus:outline-none"
+                  >
+                    <option value="Maintenance Issue">Maintenance Issue</option>
+                    <option value="Noise Complaint">Noise Complaint</option>
+                    <option value="Threats or violence">
+                      Threats or violence
+                    </option>
+                    <option value="Failing to make necessary repairs">
+                      Failing to make necessary repairs
+                    </option>
+                    <option value="Illegal activity">Illegal activity</option>
+                    <option value="Property damage">Property damage</option>
+                    <option value="landlord/broker">landlord/broker</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="flex  flex-col   mt-4 px-6 ">
+                  <label htmlFor="comment" className=" font-semibold text-lg">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    required
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full outline-none  p-2 h-20 shadow-lg  border-2 border-gray-500 rounded-lg"
+                  ></textarea>
+                </div>
+
+                {reportLoading ? (
+                  <Loader />
+                ) : (
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded self-start"
+                    type="submit"
+                    onClick={(e) => reportHandler(e)}
+                  >
+                    send report
+                  </button>
+                )}
+              </form>
+            }
+          </Modal>
         </div>
       )}
     </div>

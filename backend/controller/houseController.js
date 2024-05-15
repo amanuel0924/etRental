@@ -1,7 +1,10 @@
+import fs from "fs"
+import path from "path"
 import asyncHandler from "express-async-handler"
 import House from "./../model/houseModel.js"
 import PendingOrder from "../model/pendingOrderModel.js"
 import { uploadHousePhoto, resize } from "./uploadController.js"
+
 const getAllHouse = asyncHandler(async (req, res) => {
   const pageSize = 8
   const page = Number(req.query.pageNumber) || 1
@@ -14,6 +17,32 @@ const getAllHouse = asyncHandler(async (req, res) => {
         },
       }
     : { active: true }
+  const count = await House.countDocuments(queryObj)
+  const houses = await House.find(queryObj)
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+  if (!houses) {
+    res.status(404)
+    throw new Error("House not found")
+  }
+  res.status(200).json({
+    result: houses.length,
+    page,
+    pages: Math.ceil(count / pageSize),
+    houses,
+  })
+})
+const getAllHouseforAdmin = asyncHandler(async (req, res) => {
+  const pageSize = 7
+  const page = Number(req.query.pageNumber) || 1
+  const queryObj = req.query.keyword
+    ? {
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {}
   const count = await House.countDocuments(queryObj)
   const houses = await House.find(queryObj)
     .limit(pageSize)
@@ -107,7 +136,7 @@ const createHouse = asyncHandler(async (req, res) => {
 
 const getSingleHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const house = await House.findById(id)
+  const house = await House.findById(id).populate("feedbacks.renter")
   if (!house) {
     res.status(404)
     throw new Error("House not found")
@@ -142,13 +171,21 @@ const updateHouse = asyncHandler(async (req, res) => {
     "category",
     "siteLocation",
   ]
+
   const updates = Object.keys(req.body).reduce((acc, key) => {
     if (allowedUpdates.includes(key)) {
       acc[key] = req.body[key]
     }
     return acc
   }, {})
-
+  if (req.files) {
+    await Promise.all(
+      house.image.map(async (file) => {
+        const imagePath = path.join("..", "backend", "uploads", "house", file)
+        await fs.promises.unlink(imagePath)
+      })
+    )
+  }
   const updatedhouse = await House.findByIdAndUpdate(id, updates, {
     new: true,
     runValidators: true,
@@ -162,11 +199,22 @@ const updateHouse = asyncHandler(async (req, res) => {
 
 const deleteHouse = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const house = await House.findByIdAndDelete(id)
+
+  let house = await House.findById(id)
   if (!house) {
     res.status(404)
     throw new Error("House not found")
   }
+  if (house.image) {
+    await Promise.all(
+      house.image.map(async (file) => {
+        const imagePath = path.join("..", "backend", "uploads", "house", file)
+        await fs.promises.unlink(imagePath)
+      })
+    )
+  }
+  house = await House.findByIdAndDelete(id)
+
   res.status(200).json({ message: "House deleted successfully" })
 })
 
@@ -220,12 +268,14 @@ const createFeedback = asyncHandler(async (req, res, next) => {
 
   if (house) {
     //check if renter is renter of this house in rentehistory array
-    const renterIsExist = house.renterHistory.find(
+    const renterIsExist = house.rentershistory.find(
       (renter) => renter.toString() === req.user._id.toString()
     )
     if (!renterIsExist) {
       res.status(400)
-      throw new Error("you can't give feedback for this house")
+      throw new Error(
+        "Only renters who have history can give feedback in this house"
+      )
     }
 
     const feedbackIsExist = house.feedbacks.find(
@@ -262,6 +312,7 @@ const createFeedback = asyncHandler(async (req, res, next) => {
     throw new Error("resource not found")
   }
 })
+
 const createBrokersRequest = asyncHandler(async (req, res) => {
   const { id: houseId } = req.params
   const house = await House.findById(houseId)
@@ -393,4 +444,5 @@ export {
   acceptBrokerRequest,
   rejectBrokerRequest,
   makeHouseAvailable,
+  getAllHouseforAdmin,
 }

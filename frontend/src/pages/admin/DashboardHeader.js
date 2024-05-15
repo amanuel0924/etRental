@@ -3,9 +3,28 @@ import { HiOutlineSearch } from "react-icons/hi"
 import classNames from "classnames"
 import { useNavigate } from "react-router-dom"
 import { Menu, Transition } from "@headlessui/react"
+import { useLogoutMutation } from "../../store/slices/userApiSlice"
+import { toast } from "react-toastify"
+import { useDispatch } from "react-redux"
+import { logout } from "../../store/slices/authSlice"
+import { useGetProfileQuery } from "../../store/slices/userApiSlice"
 
 const DashboardHeader = () => {
   const navigate = useNavigate()
+  const { data: user } = useGetProfileQuery()
+  const [logoutUser] = useLogoutMutation()
+  const dispatch = useDispatch()
+  const logoutHandler = async () => {
+    try {
+      await logoutUser().unwrap()
+      dispatch(logout())
+      toast.success("Logout successfully")
+      navigate("/login")
+    } catch (error) {
+      toast.error(error.data.message || error.message)
+    }
+  }
+
   return (
     <div className="h-16 p-4 bg-white flex justify-between items-center">
       <div className="relative">
@@ -24,8 +43,7 @@ const DashboardHeader = () => {
               <div
                 className="h-10 w-10 rounded-full bg-sky-500 bg-cover bg-no-repeat bg-center"
                 style={{
-                  backgroundImage:
-                    'url("https://source.unsplash.com/80x80?face")',
+                  backgroundImage: `url("http://localhost:6060/uploads/user/${user?.image}")`,
                 }}
               >
                 <span className="sr-only">Marc Backes</span>
@@ -45,6 +63,19 @@ const DashboardHeader = () => {
               <Menu.Item>
                 {({ active }) => (
                   <div
+                    onClick={() => navigate("/")}
+                    className={classNames(
+                      active && "bg-gray-100",
+                      "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                    )}
+                  >
+                    Home
+                  </div>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <div
                     onClick={() => navigate("/profile")}
                     className={classNames(
                       active && "bg-gray-100",
@@ -58,25 +89,13 @@ const DashboardHeader = () => {
               <Menu.Item>
                 {({ active }) => (
                   <div
-                    onClick={() => navigate("/settings")}
+                    onClick={logoutHandler}
                     className={classNames(
                       active && "bg-gray-100",
-                      "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
+                      "active:bg-gray-200  rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
                     )}
                   >
-                    Settings
-                  </div>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <div
-                    className={classNames(
-                      active && "bg-gray-100",
-                      "active:bg-gray-200 rounded-sm px-4 py-2 text-gray-700 cursor-pointer focus:bg-gray-200"
-                    )}
-                  >
-                    Sign out
+                    Log out
                   </div>
                 )}
               </Menu.Item>

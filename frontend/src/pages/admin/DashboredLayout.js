@@ -9,7 +9,7 @@ const DashboredLayout = () => {
       <Sidebar />
       <div className=" flex-1 p-4">
         <Header />
-        <div className="p-4 h-screen">
+        <div className="p-4 h-full overflow-scroll ">
           <Outlet />
         </div>
       </div>

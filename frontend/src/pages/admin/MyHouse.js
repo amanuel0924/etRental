@@ -22,7 +22,7 @@ function MyHouse() {
   })
   const [deleteHouse, { isLoading: deleteLoading }] = useDeleteMyHouseMutation()
   const [lockAndUnlockHouse] = useLockAndUnlockHouseMutation()
-
+  console.log(data)
   const handelelockandunloakClick = async (id) => {
     try {
       await lockAndUnlockHouse(id).unwrap()
@@ -58,7 +58,7 @@ function MyHouse() {
           <div>House not found</div>
         )
       ) : (
-        <div className="flex flex-col dark:bg-gray-700 flex-1 mt-3 w-full  ">
+        <div className="flex flex-col dark:bg-gray-700 flex-1 mt-3 w-full   ">
           <div className="-m-1.5 overflow-x-auto">
             <div className="p-1.5 min-w-full inline-block align-middle  ">
               <div className="overflow-hidden rounded-lg ">
@@ -186,7 +186,11 @@ function MyHouse() {
       )}
       {data?.page && data?.pages && !keyword && (
         <div className=" ">
-          <Paginate page={data.page} pages={data.pages} />
+          <Paginate
+            page={data.page}
+            pages={data.pages}
+            link="/dashboard/my-houses"
+          />
         </div>
       )}
 

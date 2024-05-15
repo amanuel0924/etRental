@@ -34,12 +34,16 @@ router.use(protect)
 router.route("/logout").post(logout)
 router
   .route("/profile")
-  .put(updateUserProfile)
+  .put(uploadUserPhoto, resizeUser, updateUserProfile)
   .get(getUserProfile)
   .delete(deleteMe)
 
 router.use(allowedTO("admin", "super"))
-router.route("/:id").get(getUserById).put(updateUser).delete(deleteUser)
+router
+  .route("/:id")
+  .get(getUserById)
+  .put(uploadUserPhoto, resizeUser, updateUser)
+  .delete(deleteUser)
 router.route("/").get(getAlluser)
 router.route("/block/:id").put(blockUser)
 router.route("/unblock/:id").put(unBlockUser)

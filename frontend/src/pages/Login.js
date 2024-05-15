@@ -22,13 +22,12 @@ const Login = () => {
       const userformdata = { email, password }
 
       const res = await login(userformdata).unwrap()
-      console.log("ress,", res)
+
       dispatch(setCredentials(res))
       toast.success("you are logedin succefuly")
       navigate("/")
     } catch (error) {
-      console.log(error)
-      toast.error(error?.data?.message || "login faild")
+      toast.error(error?.data?.message || error?.message)
     }
   }
   useEffect(() => {

@@ -13,6 +13,7 @@ import {
   lockAndUnlockHouse,
   createFeedback,
   makeHouseAvailable,
+  getAllHouseforAdmin,
 } from "./../controller/houseController.js"
 import { protect, allowedTO } from "./../middleware/authMiddleware.js"
 import { uploadHousePhoto, resize } from "./../controller/uploadController.js"
@@ -32,6 +33,11 @@ router
 router
   .route("/myHouse")
   .get(protect, allowedTO("broker", "landlord"), getMyHouse)
+
+router
+  .route("/allHouse")
+  .get(protect, allowedTO("super", "admin"), getAllHouseforAdmin)
+
 router
   .route("/sendBrokersRequest/:id")
   .post(protect, allowedTO("broker"), createBrokersRequest)
@@ -52,9 +58,7 @@ router
   .get(protect, getSingleHouse)
   .put(protect, uploadHousePhoto, resize, updateHouse)
   .delete(protect, allowedTO("super", "admin"), deleteHouse)
-router
-  .route("/createFeedback/:id")
-  .post(protect, allowedTO("renter"), createFeedback)
+router.route("/createFeedback/:id").post(protect, createFeedback)
 
 router
   .route("/deleteMyHouse/:id")

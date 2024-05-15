@@ -24,6 +24,8 @@ import Profile from "./pages/Profile"
 import PendingDetail from "./pages/PendingDetail"
 import MyPending from "./pages/MyPending"
 import RentedHouse from "./pages/RentedHouse"
+import Nomach from "./componets/Nomach"
+import PrivateRouter from "./componets/PrivateRouter"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -37,12 +39,18 @@ const router = createBrowserRouter(
         <Route path="/houses" element={<HouseList />} />
         <Route path="/houses/:pageNumber" element={<HouseList />} />
         <Route path="/houses/detail/:id" element={<HouseDetail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/pending" element={<MyPending />} />
-        <Route path="/pending/:id" element={<PendingDetail />} />
-        <Route path="/rentedHouse" element={<RentedHouse />} />
+        <Route path="" element={<PrivateRouter />}>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/pending" element={<MyPending />} />
+          <Route path="/pending/:id" element={<PendingDetail />} />
+          <Route path="/rentedHouse" element={<RentedHouse />} />
+        </Route>
       </Route>
-      <Route path="/dashboard/*" element={<Dashboard />} />
+      <Route path="" element={<PrivateRouter />}>
+        <Route path="/dashboard/*" element={<Dashboard />} />
+      </Route>
+
+      <Route path="*" element={<Nomach />} />
     </Route>
   )
 )

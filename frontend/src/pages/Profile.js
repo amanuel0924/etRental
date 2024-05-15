@@ -23,6 +23,8 @@ const Profile = () => {
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
+  const [images, setImages] = useState("")
+  const formData = new FormData()
   const { data, error, isLoading, refetch } = useGetProfileQuery(id)
   const [updateUser, { isLoading: loading }] = useUpdateProfileMutation()
   const navigate = useNavigate()
@@ -30,18 +32,24 @@ const Profile = () => {
   const [deleteUser, { isLoading: deleteloading }] = useDeleteProfileMutation()
   const [logoutUser] = useLogoutMutation()
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    setImages(file)
+  }
+
   const updateHandler = async (e) => {
     e.preventDefault()
     if (!name || !email || !phone) {
       toast.error("please fill all input")
     } else {
       try {
-        const res = await updateUser({
-          name,
-          email,
-          phone,
-          password,
-        }).unwrap()
+        formData.append("name", name)
+        formData.append("email", email)
+        formData.append("phone", phone)
+        formData.append("password", password)
+        formData.append("image", images)
+
+        await updateUser(formData).unwrap()
         toast.success("user updated successfully")
         setOpen(false)
         refetch()
@@ -135,6 +143,12 @@ const Profile = () => {
               className="w-full p-1 border-2 border-gray-300 rounded-md focus:outline-none outline-none focus:border-gray-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+            <input
+              type="file"
+              placeholder="choose file...."
+              className="w-full p-1 border-2 border-gray-300 rounded-md focus:outline-none outline-none focus:border-gray-500"
+              onChange={(e) => handleFileChange(e)}
             />
 
             {loading ? (

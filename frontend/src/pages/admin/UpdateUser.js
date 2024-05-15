@@ -14,8 +14,15 @@ const UpdateUser = () => {
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [role, setRole] = useState("")
-  const { data, error, isLoading } = useGetSingleuserQuery(id)
+  const [images, setImages] = useState("")
+  const formData = new FormData()
+  const { data, error, isLoading, refetch } = useGetSingleuserQuery(id)
   const [updateUser, { isLoading: updateLoading }] = useUpdateUserMutation()
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0]
+    setImages(file)
+  }
 
   const updateHandler = async (e) => {
     e.preventDefault()
@@ -23,15 +30,16 @@ const UpdateUser = () => {
       toast.error("please fill all input")
     } else {
       try {
-        const res = await updateUser({
-          id,
-          name,
-          email,
-          phone,
-          role,
-        }).unwrap()
-        console.log(res)
+        formData.append("name", name)
+        formData.append("email", email)
+        formData.append("phone", phone)
+        formData.append("role", role)
+        formData.append("image", images)
+        console.log(formData.values())
+        await updateUser({ id, formData }).unwrap()
+
         toast.success("user updated successfully")
+        refetch()
         navigate("/dashboard/users")
       } catch (error) {
         toast.error(error?.data?.message || error?.message)
@@ -138,6 +146,22 @@ const UpdateUser = () => {
                       <option value="broker">Broker</option>
                       <option value="renter">Renter</option>
                     </select>
+                  </div>
+                  <div className=" mt-6">
+                    <label
+                      htmlFor="file"
+                      className="  text-md font-medium opacity-75    "
+                    >
+                      Image
+                    </label>
+                    <input
+                      type="file"
+                      name="file"
+                      id="file"
+                      placeholder="select profile image"
+                      onChange={(e) => handleFileChange(e)}
+                      className="peer peer mt-1 w-full border-2 border-gray-300 px-3 py-2 placeholder:text-transparent focus:border-gray-500 focus:outline-none rounded-md"
+                    />
                   </div>
 
                   <div className="my-6 text-center">

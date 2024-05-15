@@ -12,6 +12,7 @@ const linkClass =
 
 const Sidebar = () => {
   const user = useSelector((state) => state.auth.user)
+
   return (
     <div className="flex flex-col p-3 w-60 bg-gray-900 text-white ">
       <Link
@@ -22,7 +23,7 @@ const Sidebar = () => {
         <span> etRental</span>
       </Link>
       <div className="flex-1 flex flex-col gap-0.5 pt-6 ">
-        {(user.role === "admin" || user.role === "super") &&
+        {(user?.role === "admin" || user?.role === "super") &&
           DASHBOARD_SIDEBAR_LINKS.map((item) => {
             return (
               <NavLink
@@ -38,7 +39,7 @@ const Sidebar = () => {
               </NavLink>
             )
           })}
-        {(user.role === "landlord" || user.role === "broker") &&
+        {(user?.role === "landlord" || user?.role === "broker") &&
           LANDLORD_BROKER_DASHBOARD_SIDEBAR_LINKS.map((item) => {
             return (
               <NavLink

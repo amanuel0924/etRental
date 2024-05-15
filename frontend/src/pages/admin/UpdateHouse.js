@@ -20,7 +20,12 @@ const UpdateHouse = () => {
   const navigate = useNavigate()
 
   const [updateHouse, { isLoading }] = useUpdateHouseMutation()
-  const { data, error, isLoading: loading } = useGetSingleHouseQuery(id)
+  const {
+    data,
+    error,
+    isLoading: loading,
+    refetch,
+  } = useGetSingleHouseQuery(id)
   console.log(data)
 
   const handleFileChange = (e) => {
@@ -34,15 +39,7 @@ const UpdateHouse = () => {
   }
   const onsubmitHandler = async (e) => {
     e.preventDefault()
-    console.log({
-      images,
-      description,
-      name,
-      price,
-      siteLocation,
-      category,
-      type,
-    })
+
     if (
       images &&
       description &&
@@ -65,6 +62,7 @@ const UpdateHouse = () => {
       try {
         await updateHouse({ id, formData }).unwrap()
         toast.success("house updated successfully")
+        refetch()
         navigate("/dashboard/my-houses")
       } catch (error) {
         toast.error(error.data.message || error.message)

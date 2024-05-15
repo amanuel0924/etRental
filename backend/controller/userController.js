@@ -1,3 +1,5 @@
+import fs from "fs"
+import path from "path"
 import User from "../model/userModel.js"
 import asyncHandler from "express-async-handler"
 import bcrypt from "bcrypt"
@@ -31,6 +33,7 @@ export const register = asyncHandler(async (req, res, next) => {
     email,
     password: hashedPassword,
     role: role,
+
     phoneNumber: phone,
   })
   if (user) {
@@ -105,6 +108,7 @@ export const login = asyncHandler(async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      image: user.image,
       role: user.role,
     })
   } else {
@@ -182,6 +186,11 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 })
 export const updateUserProfile = asyncHandler(async (req, res, next) => {
   const { name, email, password, image, phone } = req.body
+  let updatedUser = await User.findById(req.user._id)
+  if (!updatedUser) {
+    res.status(404)
+    throw new Error("User not found")
+  }
 
   let updatedFields = {}
   if (name) updatedFields.name = name
@@ -192,15 +201,20 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
     const salt = await bcrypt.genSalt(10)
     updatedFields.password = await bcrypt.hash(password, salt)
   }
-
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    updatedFields,
-    {
-      new: true,
-      runValidators: false,
-    }
-  )
+  if (req.file && updatedUser.image !== "default.jpg") {
+    const imagePath = path.join(
+      "..",
+      "backend",
+      "uploads",
+      "user",
+      updatedUser.image
+    )
+    await fs.promises.unlink(imagePath)
+  }
+  updatedUser = await User.findByIdAndUpdate(req.user._id, updatedFields, {
+    new: true,
+    runValidators: false,
+  })
   if (updatedUser) {
     generateToken(res, updatedUser._id)
     res.status(201).json({
@@ -247,6 +261,7 @@ export const deactivateUser = asyncHandler(async (req, res, next) => {
 
 export const deleteUser = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id)
+
   if (!user) {
     res.status(404)
     throw new Error("User not found")
@@ -260,6 +275,12 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
     throw new Error("you have not permisstion to delete  admin")
   }
 
+  if (user.image !== "default.jpg") {
+    const imagePath = path.join("..", "backend", "uploads", "user", user.image)
+
+    await fs.promises.unlink(imagePath)
+  }
+
   await User.deleteOne({ _id: req.params.id })
   res.status(200).json({ message: "User removed" })
 })
@@ -267,7 +288,6 @@ export const deleteUser = asyncHandler(async (req, res, next) => {
 export const updateUser = asyncHandler(async (req, res, next) => {
   const { name, email, image, phone } = req.body
   const user = await User.findById(req.params.id)
-
   if (!user) {
     res.status(404)
     throw new Error("User not found")
@@ -276,6 +296,11 @@ export const updateUser = asyncHandler(async (req, res, next) => {
   if (user.role === "admin" && req.user.role !== "super") {
     res.status(404)
     throw new Error("you have not permisstion to update  admin")
+  }
+
+  if (req.file && user.image !== "default.jpg") {
+    const imagePath = path.join("..", "backend", "uploads", "user", user.image)
+    await fs.promises.unlink(imagePath)
   }
   user.name = name || user.name
   user.email = email || user.email

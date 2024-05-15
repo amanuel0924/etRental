@@ -17,15 +17,29 @@ export const houseApi = apiSlice.injectEndpoints({
         params: { pageNumber, keyword },
       }),
     }),
+    getAllHouseforadmin: builder.query({
+      query: ({ pageNumber, keyword }) => ({
+        url: `${HOUSE_URL}/allHouse`,
+        method: "GET",
+        params: { pageNumber, keyword },
+      }),
+    }),
     getMyhouses: builder.query({
-      query: () => ({
+      query: ({ pageNumber, keyword }) => ({
         url: `${HOUSE_URL}/myHouse`,
         method: "GET",
+        params: { pageNumber, keyword },
       }),
     }),
     deleteMyHouse: builder.mutation({
       query: (id) => ({
         url: `${HOUSE_URL}/deleteMyHouse/${id}`,
+        method: "DELETE",
+      }),
+    }),
+    deleteHousePermanent: builder.mutation({
+      query: (id) => ({
+        url: `${HOUSE_URL}/${id}`,
         method: "DELETE",
       }),
     }),
@@ -47,6 +61,13 @@ export const houseApi = apiSlice.injectEndpoints({
       query: (id) => ({
         url: `${HOUSE_URL}/lockAndUnlockHouse/${id}`,
         method: "PUT",
+      }),
+    }),
+    sendBrokersRequest: builder.mutation({
+      query: (data) => ({
+        url: `${HOUSE_URL}/sendBrokersRequest/${data.id}`,
+        method: "POST",
+        body: data,
       }),
     }),
     acceptbroker: builder.mutation({
@@ -71,7 +92,7 @@ export const houseApi = apiSlice.injectEndpoints({
     }),
     createFeedback: builder.mutation({
       query: (data) => ({
-        url: `${HOUSE_URL}/feedback`,
+        url: `${HOUSE_URL}/createFeedback/${data.id}`,
         method: "POST",
         body: data,
       }),
@@ -90,4 +111,8 @@ export const {
   useRejectBrokerMutation,
   useGetAllHouseQuery,
   useMakeAvailableHouseMutation,
+  useCreateFeedbackMutation,
+  useSendBrokersRequestMutation,
+  useGetAllHouseforadminQuery,
+  useDeleteHousePermanentMutation,
 } = houseApi

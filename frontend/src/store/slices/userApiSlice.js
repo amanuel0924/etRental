@@ -67,7 +67,7 @@ export const userApi = apiSlice.injectEndpoints({
       query: (data) => ({
         url: `${USER_URL}/${data.id}`,
         method: "PUT",
-        body: data,
+        body: data.formData,
       }),
     }),
     getProfile: builder.query({

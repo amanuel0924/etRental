@@ -3,19 +3,20 @@ import Logo from "./../assets/logo.png"
 import SearchHeader from "./SearchHeader"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { FaBars, FaXmark } from "react-icons/fa6"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import { logout } from "../store/slices/authSlice"
 import { useLogoutMutation } from "../store/slices/userApiSlice"
-import Loader from "./Loader"
 import { toast } from "react-toastify"
 import { Menu, Transition } from "@headlessui/react"
 import classNames from "classnames"
+import { useGetProfileQuery } from "../store/slices/userApiSlice"
 
 const Header = () => {
   const [menu, setMenu] = useState(false)
-  const user = useSelector((state) => state.auth.user)
+  const { data: user } = useGetProfileQuery()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
   const handleMenu = () => {
     setMenu(!menu)
   }
@@ -30,6 +31,7 @@ const Header = () => {
       toast.error(error.data.message || error.message)
     }
   }
+  console.log(user)
 
   const location = useLocation()
   console.log(location)
@@ -51,8 +53,7 @@ const Header = () => {
                   <div
                     className="h-10 w-10 rounded-full bg-sky-500 bg-cover bg-no-repeat bg-center"
                     style={{
-                      backgroundImage:
-                        'url("https://source.unsplash.com/80x80?face")',
+                      backgroundImage: `url("http://localhost:6060/uploads/user/${user?.image}")`,
                     }}
                   >
                     <span className="sr-only">Marc Backes</span>

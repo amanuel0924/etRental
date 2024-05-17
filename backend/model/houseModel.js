@@ -57,7 +57,6 @@ const houseSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     siteLocation: {
       type: String,
       required: true,
@@ -69,15 +68,7 @@ const houseSchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: [
-        "one-bedroom",
-        "two-bedroom",
-        "three-bedroom",
-        "studio",
-        "single",
-        "G+1",
-        "G+2",
-      ],
+      enum: ["2-bedroom", "3-bedroom", "studio", "single"],
       default: "single",
     },
     price: {

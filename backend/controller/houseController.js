@@ -8,15 +8,25 @@ import { uploadHousePhoto, resize } from "./uploadController.js"
 const getAllHouse = asyncHandler(async (req, res) => {
   const pageSize = 8
   const page = Number(req.query.pageNumber) || 1
-  const queryObj = req.query.keyword
-    ? {
-        active: true,
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
-    : { active: true }
+  const queryObj = { active: true }
+  console.log(req.query)
+  if (req.query.keyword) {
+    queryObj.name = {
+      $regex: req.query.keyword,
+      $options: "i",
+    }
+  }
+  if (req.query.category) {
+    queryObj.category = req.query.category
+  }
+
+  if (req.query.type) {
+    queryObj.type = req.query.type
+  }
+
+  if (req.query.sitelocation) {
+    queryObj.sitelocation = req.query.sitelocation
+  }
 
   const count = await House.countDocuments(queryObj)
   const houses = await House.find(queryObj)

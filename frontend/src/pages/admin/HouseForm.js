@@ -170,13 +170,10 @@ const HouseForm = () => {
                     className="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none"
                     onChange={(e) => setType(e.target.value)}
                   >
-                    <option value="one-bedroom">one-bedroom</option>
-                    <option value="two-bedroom">two-bedroom</option>
-                    <option value="three-bedroom">three-bedroom</option>
+                    <option value="2-bedroom">one-bedroom</option>
+                    <option value="3-bedroom">two-bedroom</option>
                     <option value="studio">studio</option>
                     <option value="single">single</option>
-                    <option value="G+1">G+1</option>
-                    <option value="G+2">G+2</option>
                   </select>
                 </div>
               </div>

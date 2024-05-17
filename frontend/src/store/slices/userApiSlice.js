@@ -90,6 +90,12 @@ export const userApi = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+    getAlluserbyRolestatstic: builder.query({
+      query: () => ({
+        url: `${USER_URL}/getUsersByRole`,
+        method: "GET",
+      }),
+    }),
   }),
 })
 
@@ -107,4 +113,5 @@ export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
   useDeleteProfileMutation,
+  useGetAlluserbyRolestatsticQuery,
 } = userApi

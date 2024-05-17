@@ -11,6 +11,7 @@ const Register = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [phone, setPhone] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -27,8 +28,13 @@ const Register = () => {
       toast.error("password's are not mach")
     } else {
       try {
-        const response = await register({ email, password, name }).unwrap()
-        dispatch(setCredentials({ response }))
+        const response = await register({
+          email,
+          password,
+          name,
+          phone,
+        }).unwrap()
+        dispatch(setCredentials({ ...response }))
         toast.success("account created succesfully")
         navigate("/")
       } catch (error) {
@@ -89,6 +95,24 @@ const Register = () => {
                   className="peer mt-1 w-full border-2 border-gray-300 px-3 py-2 placeholder:text-transparent focus:border-gray-500 focus:outline-none rounded-md"
                 />
               </div>
+              <div className="relative mt-6">
+                <label
+                  htmlFor="PHONE"
+                  className=" text-md font-medium opacity-75 "
+                >
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="09*********"
+                  className="peer mt-1 w-full border-2 border-gray-300 px-3 py-2 placeholder:text-transparent focus:border-gray-500 focus:outline-none rounded-md"
+                />
+              </div>
+
               <div className="relative mt-6">
                 <label
                   htmlFor="password"

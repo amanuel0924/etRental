@@ -39,7 +39,7 @@ const Profile = () => {
 
   const updateHandler = async (e) => {
     e.preventDefault()
-    if (!name || !email || !phone) {
+    if (!name || !email || !phone || !images) {
       toast.error("please fill all input")
     } else {
       try {
@@ -47,7 +47,7 @@ const Profile = () => {
         formData.append("email", email)
         formData.append("phone", phone)
         formData.append("password", password)
-        formData.append("image", images)
+        formData.append("image", images || data?.image)
 
         await updateUser(formData).unwrap()
         toast.success("user updated successfully")

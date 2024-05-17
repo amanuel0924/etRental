@@ -1,50 +1,56 @@
 import React from "react"
 import landingPageImage from "./../assets/landing.jpg"
-import { FaSearch } from "react-icons/fa"
+import Feature from "../componets/mock/Future"
+import ComingSoonCard from "../componets/ComingSoonCard"
+import { Link } from "react-router-dom"
 
 const Home = () => {
   return (
-    <div className=" w-full h-screen  ">
-      <div className="  bg-cover bg-center h-full w-full">
-        <div
-          className="h-[500px] w-full bg-no-repeat bg-cover bg-center flex items-center justify-center "
-          style={{ backgroundImage: `url('${landingPageImage}')` }}
-        >
-          <div className="  flex flex-col  items-center max-w-[800px] ">
-            <h1 className=" text-white text-3xl py-3 font-bold">
-              Find your dream house to liive in
-            </h1>
-            <p className=" text-white text-md pb-2">
-              We have the best houses for you to live in. You can rent
-            </p>
-            <div className=" bg-white flex flex-col rounded-lg w-full">
-              <h4 className=" font-semibold text-center w-full p-1   h-full border-b-2">
-                <span className=" p-1  border-b-4 border-purple-600">
-                  To rent
-                </span>
-              </h4>
-              <div className="felx flex-col rounded-b-lg px-2  mt-2">
-                <label htmlFor="location" className=" text-sm font-semibold">
-                  Enter a location
-                </label>
-                <div className="flex space-x-2 justify-between   pb-2 ">
-                  <input
-                    type="text"
-                    name="location"
-                    id="location"
-                    placeholder="eg. AddisAbaba"
-                    className="px-2  w-full border-2 focus:outline-none rounded-md border-gray-500  "
-                  />
-                  <button className=" bg-violet-600 rounded-md text-white px-4 py-1 space-x-3  flex items-center justify-between   border">
-                    <FaSearch fontWeight={50} />
-                    <span>Search</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className=" w-full flex flex-col ">
+      <div className="relative bg-gradient-to-r from-purple-600 to-blue-600 h-screen text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src={landingPageImage}
+            alt="Background"
+            className="object-cover object-center w-full h-full"
+          />
+          <div className="absolute inset-0 bg-black opacity-50"></div>
+        </div>
+
+        <div className="relative z-10 flex flex-col justify-center items-center h-full text-center">
+          <h1 className="text-5xl font-bold leading-tight mb-4">
+            Welcome to Our Rental Website
+          </h1>
+          <p className="text-lg text-gray-300 mb-8">
+            Discover amazing Houses and services that await you.
+          </p>
+          <Link
+            to="/houses"
+            className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 py-2 px-6 rounded-full text-lg font-semibold transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+          >
+            Get Started
+          </Link>
         </div>
       </div>
+
+      <div>
+        <div className="text-center mb-12 mt-20">
+          <h2 className="text-4xl font-extrabold text-gray-900  sm:text-5xl">
+            Coming Soon
+          </h2>
+          <p className="mt-4 text-xl text-gray-500">
+            We're working on something awesome for you! Stay tuned for updates
+          </p>
+        </div>
+        <div className="flex space-x-6 justify-center flex-wrap">
+          <ComingSoonCard />
+          <ComingSoonCard />
+          <ComingSoonCard />
+          <ComingSoonCard />
+        </div>
+      </div>
+
+      <Feature />
     </div>
   )
 }

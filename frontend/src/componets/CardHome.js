@@ -18,7 +18,7 @@ const CardHome = ({ house }) => {
         <div className="md:w-1/2 w-full    ">
           <img
             alt="ecommerce"
-            className="w-full md:max-w-[500px]  h-full    rounded "
+            className="w-full md:max-w-[400px]  h-full    rounded "
             src={`http://localhost:6060/uploads/house/${house?.image[0]}`}
           />
         </div>
@@ -57,21 +57,30 @@ const CardHome = ({ house }) => {
               <p>{house.viewCount}</p>
             </button>
           </div>
-          <div className="flex flex-col my-2">
+          <div className="flex flex-col  my-2">
             <h2 className=" font-bold text-xl ">{house.name}</h2>
-            <p className="  text-sm space-x-3">
-              <span className=" text-sm ">Type:</span>
-              <span className=" font-semibold lowercase text-yellow-600">
-                {`${house.type}`}
-              </span>
-              <span className="text-sm  ">Category:</span>
-              <span className=" font-semibold lowercase text-yellow-600">
-                {`${house.category}`}
-              </span>
-              <span className="text-sm  ">location:</span>
-              <span className=" font-semibold lowercase text-yellow-600">
-                {`${house.siteLocation}`}
-              </span>
+            <p className=" flex flex-wrap  text-sm ">
+              <div>
+                <span className=" text-sm ">Type:</span>
+                <span className=" mx-2 font-semibold lowercase text-yellow-600">
+                  {`${house.type}`}
+                </span>
+              </div>
+              <div>
+                {" "}
+                <span className="text-sm  ">Category:</span>
+                <span className=" mx-2 font-semibold lowercase text-yellow-600">
+                  {`${house.category}`}
+                </span>
+              </div>
+
+              <div>
+                {" "}
+                <span className="text-sm  ">location:</span>
+                <span className=" mx-2 font-semibold lowercase text-yellow-600">
+                  {`${house.siteLocation}`}
+                </span>
+              </div>
             </p>
           </div>
           <p className="leading-relaxed">

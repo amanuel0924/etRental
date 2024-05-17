@@ -14,6 +14,7 @@ import {
   createFeedback,
   makeHouseAvailable,
   getAllHouseforAdmin,
+  getHouseCountByStatus,
 } from "./../controller/houseController.js"
 import { protect, allowedTO } from "./../middleware/authMiddleware.js"
 import { uploadHousePhoto, resize } from "./../controller/uploadController.js"
@@ -33,6 +34,7 @@ router
 router
   .route("/myHouse")
   .get(protect, allowedTO("broker", "landlord"), getMyHouse)
+router.route("/getHouseCountByStatus").get(protect, getHouseCountByStatus)
 
 router
   .route("/allHouse")

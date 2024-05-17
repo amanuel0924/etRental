@@ -21,6 +21,7 @@ const Header = () => {
   const handleMenu = () => {
     setMenu(!menu)
   }
+
   const [logoutUser] = useLogoutMutation()
   const logoutHandler = async () => {
     try {
@@ -47,7 +48,7 @@ const Header = () => {
           <Link to="/houses">Houses</Link>
           <Link to="">Saved</Link>
           {user ? (
-            <Menu as="div" className="relative">
+            <Menu as="div" className="relative z-40">
               <div>
                 <Menu.Button className="ml-2 bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-400">
                   <span className="sr-only">Open user menu</span>

@@ -14,6 +14,7 @@ import {
   blockUser,
   unBlockUser,
   createUser,
+  getUsersByRole,
 } from "../controller/userController.js"
 import { protect, allowedTO } from "../middleware/authMiddleware.js"
 import {
@@ -29,8 +30,10 @@ router.route("/login").post(login)
 
 router.route("/forgotePassword").post(forgotePassword)
 router.route("/resetPassword/:token").put(reset)
+router.route("/getUsersByRole").get(getUsersByRole)
 
 router.use(protect)
+
 router.route("/logout").post(logout)
 router
   .route("/profile")

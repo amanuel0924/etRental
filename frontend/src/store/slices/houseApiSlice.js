@@ -97,6 +97,12 @@ export const houseApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    getHouseCountByStatus: builder.query({
+      query: () => ({
+        url: `${HOUSE_URL}/getHouseCountByStatus`,
+        method: "GET",
+      }),
+    }),
   }),
 })
 
@@ -115,4 +121,5 @@ export const {
   useSendBrokersRequestMutation,
   useGetAllHouseforadminQuery,
   useDeleteHousePermanentMutation,
+  useGetHouseCountByStatusQuery,
 } = houseApi

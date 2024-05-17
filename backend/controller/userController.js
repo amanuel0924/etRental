@@ -192,6 +192,8 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
     throw new Error("User not found")
   }
 
+  console.log(req.body)
+
   let updatedFields = {}
   if (name) updatedFields.name = name
   if (email) updatedFields.email = email
@@ -397,4 +399,21 @@ export const reset = asyncHandler(async (req, res, next) => {
   await user.save()
 
   res.status(200).json({ message: "password reset successfully" })
+})
+//get all users and count by role with out super admin
+export const getUsersByRole = asyncHandler(async (req, res, next) => {
+  const users = await User.aggregate([
+    {
+      $match: {
+        role: { $ne: "super" },
+      },
+    },
+    {
+      $group: {
+        _id: "$role",
+        count: { $sum: 1 },
+      },
+    },
+  ])
+  res.status(200).json(users)
 })

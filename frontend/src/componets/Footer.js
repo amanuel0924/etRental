@@ -9,7 +9,7 @@ import {
 
 const Footer = () => {
   return (
-    <>
+    <div>
       <div className="bg-gray-100">
         <div className="max-w-screen-xl  px-4 sm:px-6 text-gray-800 sm:grid md:grid-cols-4 sm:grid-cols-2 ">
           <div className="p-5">
@@ -47,14 +47,17 @@ const Footer = () => {
             <div className="text-sm uppercase text-gray-600 font-bold">
               Contact us
             </div>
-            <a className="my-3 block" href="/#">
-              XXX XXXX, Floor 4 San Francisco, CA
-              <span className="text-teal-600 text-xs p-1"></span>
-            </a>
-            <a className="my-3 block" href="/#">
-              contact@company.com
-              <span className="text-teal-600 text-xs p-1"></span>
-            </a>
+            <div className="   ">
+              <input
+                type="text"
+                name="email"
+                className="py-3 px-6 w-full my-4  border border-gray-300 shadow-sm rounded-md focus:outline-none"
+                placeholder="Enter your mail.."
+              />
+              <button className=" py-4 px-7 text-center bg-green-600 shadow-sm rounded-md text-white font-bold">
+                Subscribe
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -81,7 +84,7 @@ const Footer = () => {
           <div className="my-5">© Copyright 2020. All Rights Reserved.</div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

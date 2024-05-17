@@ -17,6 +17,7 @@ const getAllHouse = asyncHandler(async (req, res) => {
         },
       }
     : { active: true }
+
   const count = await House.countDocuments(queryObj)
   const houses = await House.find(queryObj)
     .limit(pageSize)
@@ -428,6 +429,20 @@ const makeHouseAvailable = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "House status updated successfully" })
 })
 
+// get all house and count by status
+
+const getHouseCountByStatus = asyncHandler(async (req, res) => {
+  const houseCount = await House.aggregate([
+    {
+      $group: {
+        _id: "$houseStatus",
+        count: { $sum: 1 },
+      },
+    },
+  ])
+  res.status(200).json(houseCount)
+})
+
 export {
   getAllHouse,
   createHouse,
@@ -445,4 +460,5 @@ export {
   rejectBrokerRequest,
   makeHouseAvailable,
   getAllHouseforAdmin,
+  getHouseCountByStatus,
 }

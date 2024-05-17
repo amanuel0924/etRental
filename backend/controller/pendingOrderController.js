@@ -224,6 +224,22 @@ const rejectCounterOffer = asyncHandler(async (req, res) => {
   res.status(200).json(pending)
 })
 
+const getPendingGroupByStatus = asyncHandler(async (req, res) => {
+  const pending = await PendingOrder.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+  ])
+  if (!pending) {
+    res.status(404)
+    throw new Error("Pending not found")
+  }
+  res.status(200).json(pending)
+})
+
 export {
   createPending,
   getMyPending,
@@ -235,4 +251,5 @@ export {
   acceptCounterOffer,
   rejectCounterOffer,
   getPendingOrdersForHouse,
+  getPendingGroupByStatus,
 }

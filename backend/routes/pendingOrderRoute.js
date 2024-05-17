@@ -10,6 +10,7 @@ import {
   rejectCounterOffer,
   getPendingOrdersForHouse,
   getAllPending,
+  getPendingGroupByStatus,
 } from "./../controller/pendingOrderController.js"
 import { protect, allowedTO } from "./../middleware/authMiddleware.js"
 
@@ -20,6 +21,7 @@ router
   .post(protect, allowedTO("renter"), createPending)
   .get(protect, getAllPending)
 router.route("/myPending").get(protect, getMyPending)
+router.route("/getPendingGroupByStatus").get(protect, getPendingGroupByStatus)
 router
   .route("/:id")
   .get(protect, allowedTO("landlord", "renter", "broker"), getSinglePending)

@@ -1,6 +1,6 @@
 import React from "react"
 import Loader from "../componets/Loader"
-import { Link, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import Paginate from "../componets/Paginate"
 import { useGetAllHouseQuery } from "../store/slices/houseApiSlice"
 import CardHome from "../componets/CardHome"
@@ -17,7 +17,7 @@ const HouseList = () => {
   console.log(data)
 
   return (
-    <div className="flex flex-col  justify-between  items-center ">
+    <div className="flex flex-col  justify-between  items-center  h-full min-h-screen ">
       {isLoading ? (
         <Loader />
       ) : error ? (
